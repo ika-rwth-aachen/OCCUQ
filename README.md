@@ -23,7 +23,6 @@
 -------------------------------
 
 ### [Paper](https://arxiv.org/) | [Video](https://www.youtube.com) | [Data](https://huggingface.co/datasets/TillBeemelmanns/MultiCorrupt)
-<br/>
 
 
 ## News
