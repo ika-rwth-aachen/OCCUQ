@@ -113,6 +113,12 @@ $weight \
 --eval bbox
 ```
 
+## TODOs
+
+- [ ] Add scripts for OOD detection
+- [ ] Add scripts for Region OOD Detection
+- [ ] Add Monte Carlo Dropout and Deep Ensembles
+- [ ] Add Ucertainty Guided Temperature Scaling (UGTS)
 
 
 ## Acknowledgement
