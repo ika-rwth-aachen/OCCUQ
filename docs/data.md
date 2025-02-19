@@ -1,3 +1,5 @@
+# SurroundOcc Dataset
+
 **1. Download nuScenes V1.0 full dataset data [HERE](https://www.nuscenes.org/download). Folder structure:**
 ```
 SurroundOcc
@@ -38,25 +40,13 @@ SurroundOcc
 
 ```
 
-***4. (Optional) We also provide the code to generate occupancy on nuScenes, which needs LiDAR point semantic labels [HERE](https://www.nuscenes.org/download). Folder structure:**
-```
-SurroundOcc
-├── data/
-│   ├── nuscenes/
-│   │   ├── maps/
-│   │   ├── samples/
-│   │   ├── sweeps/
-│   │   ├── v1.0-test/
-│   │   ├── v1.0-trainval/
-|   |   ├── lidarseg
-|   |   |   ├── v1.0-test
-|   |   |   ├── v1.0-trainval
-|   |   |   ├── v1.0-mini
-```
+# MultiCorrupt Dataset
+To perform OOD detection task as in our paper you would need to generate or
+download [MultiCorrupt](https://github.com/ika-rwth-aachen/MultiCorrupt).
 
-You can generate train/val split of nuScenes from 850 sequences. 
 
-```
-cd $Home/tools/generate_occupancy_nuscenes
-python generate_occupancy_nuscenes.py --config_path ./config.yaml --label_mapping ./nuscenes.yaml --split [train/val] --save_path [your/save/path] 
-```
+## Generate Dataset
+Follow the [instructions](https://github.com/ika-rwth-aachen/MultiCorrupt?tab=readme-ov-file#installation) to generate the dataset on your own.
+
+## Download Dataset
+Download the precompiled dataset from [Huggingface](https://huggingface.co/datasets/TillBeemelmanns/MultiCorrupt) and put it in the data folder (Coming soon).
