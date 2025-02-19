@@ -58,12 +58,16 @@ From multi-view camera images, our method provides 3D occupancy predictions with
 
 
 ### 1. Fit GMM
+To fit the Gaussian Mixture Model (GMM) for uncertainty estimation, run
+`gmm_fit.py` with the following command:
+
+
 ```bash
 export CUDA_VISIBLE_DEVICES=0
 export PYTHONPATH=$PYTHONPATH:/workspace
 
-config=/workspace/projects/configs/surroundocc/surroundocc_mlpv6_sn_100perc.py
-weight=/workspace/work_dirs/surroundocc_mlpv6_sn_100perc/epoch_6.pth
+config=/workspace/projects/configs/occuq/occuq_mlpv5_sn.py
+weight=/workspace/work_dirs/occuq_mlpv5_sn/epoch_6.pth
 
 python tools/gmm_fit.py \
 $config \
@@ -73,6 +77,7 @@ $weight \
 
 
 ### 2. Evaluate
+Once the GMM is fitted, you can evaluate the model using the following command:
 
 ```bash
 export CUDA_VISIBLE_DEVICES=0
@@ -89,6 +94,8 @@ $weight \
 
 
 ### 3. Generate Video
+For video generation, run the following command:
+
 ```bash
 export CUDA_VISIBLE_DEVICES=0
 export PYTHONPATH=$PYTHONPATH:/workspace
