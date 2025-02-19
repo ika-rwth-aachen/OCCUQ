@@ -1,9 +1,33 @@
-# Train and Test
+# RUN OCCUQ
 
-Check folder `/workspace/scripts` for scripts to train and test the models.
+## Download trained models and GMM
+Download and unzip weights and GMM to `work_dirs` to obtain the following structure:
+- Download Link
 
 
-Train OCCUQ with 4 A100 GPUs
+```
+work_dirs
+├── occuq_mlpv5_sn
+│   ├── 20240821_225901.log
+│   ├── 20240821_225901.log.json
+│   ├── epoch_6.pth
+│   ├── occuq_mlpv5_sn.py.py
+│   ├── train_gmm_scale_0.pt
+│   ├── train_gmm_scale_1.pt
+│   ├── train_gmm_scale_2.pt
+│   ├── train_gmm_scale_3.pt
+│   ├── train_prior_log_prob_scale_0.pt
+│   ├── train_prior_log_prob_scale_1.pt
+│   ├── train_prior_log_prob_scale_2.pt
+│   └── train_prior_log_prob_scale_3.pt
+```
+
+
+## Train & Test OCCUQ
+Check folder `/workspace/scripts` for some scripts to train and test the models.
+
+
+### Train OCCUQ Model with 4 A100 GPUs
 ```bash
 #!/bin/bash
 
@@ -15,7 +39,17 @@ export PYTHONPATH=$PYTHONPATH:/workspace
 /workspace/work_dirs/occuq_mlpv5_sn
 ```
 
-Eval OCCUQ with 1 A100 GPU
+
+### Train GMM with 1 A100 GPU
+```bash
+python tools/gmm_fit.py \
+$config \
+$weight \
+--eval bbox
+```
+
+
+### Evaluate OCCUQ with 1 A100 GPU
 ```bash
 export CUDA_VISIBLE_DEVICES=0
 export PYTHONPATH=$PYTHONPATH:/workspace
@@ -29,8 +63,8 @@ $weight \
 --eval bbox
 ```
 
+### Video Generation
 For video generation, run the following command:
-
 ```bash
 export CUDA_VISIBLE_DEVICES=0
 export PYTHONPATH=$PYTHONPATH:/workspace
@@ -44,6 +78,7 @@ $weight \
 --eval bbox
 ```
 
+### MultiCorrupt Evaluation
 To perform evaluation on MultiCorrupt run the following command:
 ```bash
 #!/bin/bash

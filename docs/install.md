@@ -82,41 +82,5 @@ docker exec -it occuq bash
 ./docker/run_in_container.sh
 ```
 
-### Evaluate OCCUQ
-
-Download weights and GMM to `work_dirs` to obtain the following structure:
-
-```
-work_dirs
-├── occuq_mlpv5_sn
-│   ├── 20240821_225901.log
-│   ├── 20240821_225901.log.json
-│   ├── epoch_6.pth
-│   ├── occuq_mlpv5_sn.py.py
-│   ├── train_gmm_scale_0.pt
-│   ├── train_gmm_scale_1.pt
-│   ├── train_gmm_scale_2.pt
-│   ├── train_gmm_scale_3.pt
-│   ├── train_prior_log_prob_scale_0.pt
-│   ├── train_prior_log_prob_scale_1.pt
-│   ├── train_prior_log_prob_scale_2.pt
-│   └── train_prior_log_prob_scale_3.pt
-```
-
-Then run the following command:
-
-
-```bash
-export CUDA_VISIBLE_DEVICES=0
-export PYTHONPATH=$PYTHONPATH:/workspace
-
-config=/workspace/projects/configs/occuq/occuq_mlpv5_sn.py 
-weight=/workspace/work_dirs/occuq_mlpv5_sn/epoch_6.pth
-
-python tools/gmm_evaluate.py \
-$config \
-$weight \
---eval bbox
-```
 
 
