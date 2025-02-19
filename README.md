@@ -61,7 +61,7 @@ From multi-view camera images, our method provides 3D occupancy predictions with
 
 
 ### 1. Fit GMM
-Download [trained model]([Download Link](https://rwth-aachen.sciebo.de/s/2o1LOb4PwFbPzSb)) 
+Download [trained model](https://rwth-aachen.sciebo.de/s/2o1LOb4PwFbPzSb)) 
 and fit the Gaussian Mixture Model (GMM) for uncertainty estimation, run
 `gmm_fit.py` with the following command:
 
