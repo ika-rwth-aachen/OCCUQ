@@ -3,6 +3,10 @@
 # ---------------------------------------------
 #  Modified by Zhiqi Li
 # ---------------------------------------------
+#  Modified by Institute for Automotive Engineering of RWTH Aachen University
+#  Modified by Visual Computing Institute of RWTH Aachen University
+#  by Severin Heidrich, Till Beemelmanns, Alexey Nekrasov
+# ---------------------------------------------
 
 #import open3d as o3d
 from tkinter.messagebox import NO

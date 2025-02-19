@@ -1,3 +1,13 @@
+# ---------------------------------------------
+# Copyright (c) OpenMMLab. All rights reserved.
+# ---------------------------------------------
+#  Modified by Zhiqi Li
+# ---------------------------------------------
+#  Modified by Institute for Automotive Engineering of RWTH Aachen University
+#  Modified by Visual Computing Institute of RWTH Aachen University
+#  by Severin Heidrich, Till Beemelmanns, Alexey Nekrasov
+# ---------------------------------------------
+
 _base_ = [
     '../datasets/custom_nus-3d.py',
     '../_base_/default_runtime.py'

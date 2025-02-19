@@ -1,3 +1,8 @@
+#  Copyright (c) Institute for Automotive Engineering of RWTH Aachen University
+#  Copyright (c) Visual Computing Institute of RWTH Aachen University
+#  by Severin Heidrich, Till Beemelmanns, Alexey Nekrasov
+# ---------------------------------------------
+
 import numpy as np
 import torch
 from tqdm import tqdm

@@ -1,7 +1,6 @@
-# ---------------------------------------------
-# Copyright (c) OpenMMLab. All rights reserved.
-# ---------------------------------------------
-#  Modified by Zhiqi Li
+#  Copyright (c) Institute for Automotive Engineering of RWTH Aachen University
+#  Copyright (c) Visual Computing Institute of RWTH Aachen University
+#  by Severin Heidrich, Till Beemelmanns, Alexey Nekrasov
 # ---------------------------------------------
 import argparse
 import mmcv

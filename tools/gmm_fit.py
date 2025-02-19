@@ -1,8 +1,8 @@
+#  Copyright (c) Institute for Automotive Engineering of RWTH Aachen University
+#  Copyright (c) Visual Computing Institute of RWTH Aachen University
+#  by Severin Heidrich, Till Beemelmanns, Alexey Nekrasov
 # ---------------------------------------------
-# Copyright (c) OpenMMLab. All rights reserved.
-# ---------------------------------------------
-#  Modified by Zhiqi Li
-# ---------------------------------------------
+
 import argparse
 import mmcv
 import os
