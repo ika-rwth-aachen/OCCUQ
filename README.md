@@ -126,6 +126,7 @@ Many thanks to these excellent projects:
 - [SurroundOCC](https://github.com/weiyithu/SurroundOcc)
 - [Deep Deterministic Uncertainty](https://github.com/omegafragger/DDU)
 - [MultiCorrupt](https://github.com/ika-rwth-aachen/MultiCorrupt)
+- [OpenMMLab](https://github.com/open-mmlab)
 
 We thank the BMBF and EU for funding this project:
 > This work has received funding from the [European Union’s Horizon Europe Research and Innovation Programme](https://research-and-innovation.ec.europa.eu/funding/funding-opportunities/funding-programmes-and-open-calls/horizon-europe_en) under Grant Agreement No. 101076754 - [AIthena project](https://aithena.eu/). The project was partially funded by the [BMBF](https://www.bmbf.de/) project “WestAI” (grant no. 01IS22094D)
