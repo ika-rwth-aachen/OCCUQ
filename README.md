@@ -22,7 +22,7 @@
 
 -------------------------------
 
-### [Paper](https://arxiv.org/) | [Video](https://www.youtube.com) | [Data](https://huggingface.co/)
+### [Paper](https://arxiv.org/) | [Video](https://www.youtube.com) | [Data](https://huggingface.co/datasets/TillBeemelmanns/MultiCorrupt)
 <br/>
 
 
@@ -43,8 +43,12 @@ From multi-view camera images, our method provides 3D occupancy predictions with
 
 ## Demo  
 ![](assets/color_bar.png)
+---------------------------------------
 ![Motorcycle](assets/demo_construction_truck.gif)
+---------------------------------------
 ![Scooter](assets/demo_weird_scooter.gif)
+---------------------------------------
+![Motorcycle Overtaking](assets/demo_motorcycle_overtaking.gif)
 ![](assets/bar.jpg)
 
 
