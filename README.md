@@ -22,7 +22,7 @@
 
 -------------------------------
 
-### [Paper](https://arxiv.org/) | [Video](https://www.youtube.com) | [Data](https://huggingface.co/datasets/TillBeemelmanns/MultiCorrupt)
+### [Paper](https://arxiv.org/) | [Video](https://www.youtube.com) | [Dataset (Coming Soon)](https://huggingface.co/datasets/TillBeemelmanns/MultiCorrupt)
 
 
 ## News
@@ -113,7 +113,7 @@ $weight \
 ```
 
 ## TODOs
-
+- [ ] Upload MultiCorrupt dataset for evaluation (Coming Soon)
 - [ ] Add scripts for OOD detection
 - [ ] Add scripts for Region OOD Detection
 - [ ] Add Monte Carlo Dropout and Deep Ensembles
