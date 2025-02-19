@@ -1,0 +1,9 @@
+data/
+extensions/chamfer_dist/build/
+extensions/chamfer_dist/chamfer.egg-info/
+extensions/chamfer_dist/dist/
+work_dirs/
+__pycache__/
+ckpts/r101_dcn_fcos3d_pretrain.pth
+multicorrupt/
+mmdetection3d/
