@@ -2,7 +2,8 @@
 
 ## Download trained models and GMM
 Download and unzip weights and GMM to `work_dirs` to obtain the following structure:
-- Download Link
+
+[Download Link](https://rwth-aachen.sciebo.de/s/2o1LOb4PwFbPzSb)
 
 
 ```
