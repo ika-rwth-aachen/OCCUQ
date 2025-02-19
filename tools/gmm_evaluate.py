@@ -1,7 +1,8 @@
-#  Copyright (c) Institute for Automotive Engineering of RWTH Aachen University
-#  Copyright (c) Computer Vision Group of RWTH Aachen University
-#  by Severin Heidrich, Till Beemelmanns, Alexey Nekrasov
-# ---------------------------------------------
+# SPDX-License-Identifier: Apache-2.0
+# 
+# Copyright (c) 2025 Institute for Automotive Engineering of RWTH Aachen University
+# Copyright (c) 2025 Computer Vision Group of RWTH Aachen University
+# by Severin Heidrich, Till Beemelmanns, Alexey Nekrasov
 import argparse
 import mmcv
 import os
