@@ -124,13 +124,6 @@ def parse_args():
         type=bool,
         default=False,
         help='whether to use front camera data for OOD evaluation')
-    # temperature scaling mode either ts or ugts
-    parser.add_argument(
-        '--ts_mode',
-        type=str,
-        default=None,
-        choices=['ts', 'ugts'],
-        help='temperature scaling mode either ts or ugts')
     parser.add_argument('--local_rank', type=int, default=0)
     args = parser.parse_args()
     if 'LOCAL_RANK' not in os.environ:
