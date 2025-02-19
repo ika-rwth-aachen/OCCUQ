@@ -54,6 +54,56 @@ From multi-view camera images, our method provides 3D occupancy predictions with
 - [Train, Eval and Visualize](docs/run.md)
 
 
+## Run OCCUQ
+
+
+### 1. Fit GMM
+```bash
+export CUDA_VISIBLE_DEVICES=0
+export PYTHONPATH=$PYTHONPATH:/workspace
+
+config=/workspace/projects/configs/surroundocc/surroundocc_mlpv6_sn_100perc.py
+weight=/workspace/work_dirs/surroundocc_mlpv6_sn_100perc/epoch_6.pth
+
+python tools/gmm_fit.py \
+$config \
+$weight \
+--eval bbox
+```
+
+
+### 2. Evaluate
+
+```bash
+export CUDA_VISIBLE_DEVICES=0
+export PYTHONPATH=$PYTHONPATH:/workspace
+
+config=/workspace/projects/configs/occuq/occuq_mlpv5_sn.py 
+weight=/workspace/work_dirs/occuq_mlpv5_sn/epoch_6.pth
+
+python tools/gmm_evaluate.py \
+$config \
+$weight \
+--eval bbox
+```
+
+
+### 3. Generate Video
+```bash
+export CUDA_VISIBLE_DEVICES=0
+export PYTHONPATH=$PYTHONPATH:/workspace
+
+config=/workspace/projects/configs/occuq/occuq_mlpv5_sn.py 
+weight=/workspace/work_dirs/occuq_mlpv5_sn/epoch_6.pth
+
+python tools/gmm_video.py \
+$config \
+$weight \
+--eval bbox
+```
+
+
+
 ## Acknowledgement
 Many thanks to these excellent projects:
 - [SurroundOCC](https://github.com/weiyithu/SurroundOcc)
