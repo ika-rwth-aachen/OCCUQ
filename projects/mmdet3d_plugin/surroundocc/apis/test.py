@@ -4,7 +4,7 @@
 #  Modified by Zhiqi Li
 # ---------------------------------------------
 #  Modified by Institute for Automotive Engineering of RWTH Aachen University
-#  Modified by Visual Computing Institute of RWTH Aachen University
+#  Modified by Computer Vision Group of RWTH Aachen University
 #  by Severin Heidrich, Till Beemelmanns, Alexey Nekrasov
 # ---------------------------------------------
 import os.path as osp
