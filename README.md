@@ -57,7 +57,7 @@ From multi-view camera images, our method provides 3D occupancy predictions with
 - [Train, Eval and Visualize](docs/run.md)
 
 
-## Run OCCUQ
+## Quick Start
 
 
 ### 1. Fit GMM

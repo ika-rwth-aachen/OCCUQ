@@ -71,13 +71,13 @@ cd ckpts & wget https://github.com/zhiqi-li/storage/releases/download/v1.0/r101_
 ./docker/run.sh
 ```
 
-Attack to running container either with VS Code or via terminal.
+Attach to running container either with VS Code or via terminal.
 ```shell
 docker exec -it occuq bash
 ```
 
 ### Install Chamfer Distance
-
+Inside the container execute the following commands to install the Chamfer Distance extension.
 ```shell
 ./docker/run_in_container.sh
 ```
