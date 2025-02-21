@@ -29,15 +29,27 @@
 - [01/31/2025] OCCUQ is accepted to ICRA2025.
 
 ## Introduction
-Current autonomous driving methods use multi-camera setups to construct 3D occupancy maps, which consist of voxels representing space occupancy and different semantic classes, serving as input for trajectory planning and collision avoidance.  While many approaches focus on dataset generation and model architecture improvements for 3D occupancy prediction, they often overlook uncertainties arising from adversarial conditions or distributional shifts, hindering real-world deployment.
+Current autonomous driving methods use multi-camera setups to construct
+3D occupancy maps, which consist of voxels representing space occupancy and
+different semantic classes, serving as input for trajectory planning and
+collision avoidance.  While many approaches focus on dataset generation and
+model architecture improvements for 3D occupancy prediction, they often
+overlook uncertainties arising from adversarial conditions or distributional
+shifts, hindering real-world deployment.
 
-In our work, we focus on the adaptation of an efficient uncertainty estimation method for 3D occupancy prediction.
-By incorporating an uncertainty module in the dense 3D occupancy detection head and separately training a Gaussian Mixture Model (GMM) at the feature level, we aim to disentangle aleatory and epistemic uncertainty during inference.
+In our work, we focus on the adaptation of an efficient uncertainty estimation
+method for 3D occupancy prediction. By incorporating an uncertainty module in
+the dense 3D occupancy detection head and separately training a 
+Gaussian Mixture Model (GMM) at the feature level, we aim to disentangle
+aleatoric and epistemic uncertainty during inference.
 
 
 ## Method 
 ![OCCUQ Overview](assets/overview.png)
-From multi-view camera images, our method provides 3D occupancy predictions with reliable epistemic and aleatoric uncertainties on a voxel level. We build on top of the SurroundOCC, and introduce an additional Uncertainty Quantification (UQ) module into the prediction head.
+From multi-view camera images, our method provides 3D occupancy predictions with
+reliable epistemic and aleatoric uncertainties on a voxel level. We build on
+top of SurroundOCC, and introduce an additional Uncertainty Quantification (UQ)
+module into the prediction head.
 
 
 ## Demo  
