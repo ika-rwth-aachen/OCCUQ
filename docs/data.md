@@ -41,12 +41,16 @@ SurroundOcc
 ```
 
 # MultiCorrupt Dataset
-To perform OOD detection task as in our paper you would need to generate or
-download [MultiCorrupt](https://github.com/ika-rwth-aachen/MultiCorrupt).
+To perform OOD detection task as in our paper you would need to *generate* or
+*download* [MultiCorrupt](https://github.com/ika-rwth-aachen/MultiCorrupt).
 
 
 ## Generate Dataset
-Follow the [instructions](https://github.com/ika-rwth-aachen/MultiCorrupt?tab=readme-ov-file#installation) to generate the dataset on your own.
+Follow the [instructions](https://github.com/ika-rwth-aachen/MultiCorrupt?tab=readme-ov-file#installation) 
+to generate the dataset on your own, by corrupting the original nuScenes dataset.
+
 
 ## Download Dataset
-Download the precompiled dataset from [Huggingface](https://huggingface.co/datasets/TillBeemelmanns/MultiCorrupt) and put it in the data folder (Coming soon).
+Download the precompiled MultiCorrupt dataset from 
+[Huggingface](https://huggingface.co/datasets/TillBeemelmanns/MultiCorrupt) 
+and put it in the data folder.
