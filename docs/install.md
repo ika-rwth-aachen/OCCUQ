@@ -1,3 +1,27 @@
+## RWTH Aachen CLAIX Cluster Setup
+
+**1. ssh onto the CLAIX GPU Node.**
+```shell
+ssh username@login23-g-1.hpc.itc.rwth-aachen.de
+```
+
+**2. Switch to GCC-based compiler.**
+```shell
+module switch intel foss
+```
+
+**2. Load the CUDA 11.3 module.**
+```shell
+module load CUDA/11.3
+```
+
+**3. Set environment variables.**
+```shell
+export CC=gcc
+export CXX=g++
+export CUDAHOSTCXX=$(which g++)
+```
+
 ## Conda Setup
 
 **1. Create a conda virtual environment and activate it.**
