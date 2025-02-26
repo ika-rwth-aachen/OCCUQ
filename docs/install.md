@@ -22,6 +22,11 @@ export CXX=g++
 export CUDAHOSTCXX=$(which g++)
 ```
 
+**4. Access node with V100 GPU.**
+```shell
+srun --partition=dgx2 --nodes=1 --mem=512G --time=05:00:00 --gpus-per-node=1 --account=supp0003 --pty /bin/bash
+```
+
 ## Conda Setup
 
 **1. Create a conda virtual environment and activate it.**
