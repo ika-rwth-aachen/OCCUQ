@@ -1,35 +1,44 @@
 ## Conda Setup
 
-Following https://github.com/weiyithu/SurroundOcc/blob/main/docs/install.md
-
 **1. Create a conda virtual environment and activate it.**
 ```shell
-conda create -n surroundocc python=3.7 -y
-conda activate surroundocc
+conda create -n occuq python==3.8 -y
+conda activate occuq
 ```
 
-**2. Install PyTorch and torchvision (tested on torch==1.10.1 & cuda=11.1).**
+**2. Install netcal.**
 ```shell
-pip install torch==1.10.1 torchvision==0.11.2 torchaudio==0.10.1
+pip install netcal
 ```
 
-**3. Install gcc>=5 in conda env.**
+**3. Install PyTorch and torchvision (tested on torch==1.10.1 & cuda=11.3).**
+```shell
+conda install pytorch==1.10.1 torchvision==0.11.2 torchaudio==0.10.1 cudatoolkit=11.3 -c pytorch -c conda-forge
+conda install mkl==2024.0
+```
+
+**4. Install gcc>=5 in conda env.**
 ```shell
 conda install -c omgarcia gcc-6 # gcc-6.2
 ```
 
-**4. Install MMCV following the [official instructions](https://github.com/open-mmlab/mmcv).**
+**5. Install MMCV following the [official instructions](https://github.com/open-mmlab/mmcv).**
 ```shell
 pip install mmcv-full==1.4.0
 ```
 
-**5. Install mmdet and mmseg.**
+**6. Install mmdet and mmseg.**
 ```shell
 pip install mmdet==2.14.0
 pip install mmsegmentation==0.14.1
 ```
 
-**6. Install mmdet3d from source code.**
+**7. Install ninja.**
+```shell
+pip install ninja
+```
+
+**8. Install mmdet3d from source code.**
 ```shell
 git clone https://github.com/open-mmlab/mmdetection3d.git
 cd mmdetection3d
@@ -37,24 +46,24 @@ git checkout v0.17.1 # Other versions may not be compatible.
 python setup.py install
 ```
 
-**7. Install other dependencies.**
+**9. Install other dependencies.**
 ```shell
+pip install scikit_image==0.19.3
+pip install lyft-dataset-sdk==0.0.8 numba==0.48.0 nuscenes-devkit==1.1.10 plyfile==0.8.1 networkx==2.2 numpy==1.21.5
 pip install timm
 pip install open3d-python
 ```
 
-**8. Install Chamfer Distance.**
+**10. Install Chamfer Distance.**
 ```shell
-cd SurroundOcc/extensions/chamfer_dist
+cd OCCUQ/extensions/chamfer_dist
 python setup.py install --user
 ```
 
-**9. Prepare pretrained models.**
+**11. Install other dependencies.**
 ```shell
-cd SurroundOcc 
-mkdir ckpts
-
-cd ckpts & wget https://github.com/zhiqi-li/storage/releases/download/v1.0/r101_dcn_fcos3d_pretrain.pth
+pip install yapf==0.40.1 setuptools==59.5.0
+pip install einops --no-deps
 ```
 
 ## Docker Setup
