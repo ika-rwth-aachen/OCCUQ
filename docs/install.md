@@ -1,31 +1,12 @@
-## RWTH Aachen CLAIX Cluster Setup
+<!-- omit in toc -->
+# Outline
+- [Conda Setup](#conda-setup)
+- [RWTH Aachen CLAIX Cluster Setup](#rwth-aachen-claix-cluster-setup)
+- [Docker Setup](#docker-setup)
+  - [Build Docker Image](#build-docker-image)
+  - [Run Docker Container](#run-docker-container)
+  - [Install Chamfer Distance](#install-chamfer-distance)
 
-**1. ssh onto the CLAIX GPU Node.**
-```shell
-ssh username@login23-g-1.hpc.itc.rwth-aachen.de
-```
-
-**2. Switch to GCC-based compiler.**
-```shell
-module switch intel foss
-```
-
-**2. Load the CUDA 11.3 module.**
-```shell
-module load CUDA/11.3
-```
-
-**3. Set environment variables.**
-```shell
-export CC=gcc
-export CXX=g++
-export CUDAHOSTCXX=$(which g++)
-```
-
-**4. Access node with V100 GPU.**
-```shell
-srun --partition=dgx2 --nodes=1 --mem=512G --time=05:00:00 --gpus-per-node=1 --account=supp0003 --pty /bin/bash
-```
 
 ## Conda Setup
 
@@ -94,6 +75,38 @@ python setup.py install --user
 pip install yapf==0.40.1 setuptools==59.5.0
 pip install einops --no-deps
 ```
+
+
+## RWTH Aachen CLAIX Cluster Setup
+
+**1. ssh onto the CLAIX GPU Node.**
+```shell
+ssh username@login23-g-1.hpc.itc.rwth-aachen.de
+```
+
+**2. Switch to GCC-based compiler.**
+```shell
+module switch intel foss
+```
+
+**2. Load the CUDA 11.3 module.**
+```shell
+module load CUDA/11.3
+```
+
+**3. Set environment variables.**
+```shell
+export CC=gcc
+export CXX=g++
+export CUDAHOSTCXX=$(which g++)
+```
+
+**4. Access node with V100 GPU.**
+```shell
+srun --partition=dgx2 --nodes=1 --mem=512G --time=05:00:00 --gpus-per-node=1 --account=supp0003 --pty /bin/bash
+```
+
+
 
 ## Docker Setup
 
