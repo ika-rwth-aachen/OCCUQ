@@ -1,4 +1,12 @@
-# SurroundOcc Dataset
+<!-- omit in toc -->
+# Outline
+- [SurroundOcc Dataset](#surroundocc-dataset)
+- [MultiCorrupt Dataset](#multicorrupt-dataset)
+  - [Generate Dataset](#generate-dataset)
+  - [Download Dataset](#download-dataset)
+
+
+## SurroundOcc Dataset
 
 **1. Download nuScenes V1.0 full dataset data [HERE](https://www.nuscenes.org/download). Folder structure:**
 ```
@@ -40,17 +48,17 @@ SurroundOcc
 
 ```
 
-# MultiCorrupt Dataset
+## MultiCorrupt Dataset
 To perform OOD detection task as in our paper you would need to *generate* or
 *download* [MultiCorrupt](https://github.com/ika-rwth-aachen/MultiCorrupt).
 
 
-## Generate Dataset
+### Generate Dataset
 Follow the [instructions](https://github.com/ika-rwth-aachen/MultiCorrupt?tab=readme-ov-file#installation) 
 to generate the dataset on your own, by corrupting the original nuScenes dataset.
 
 
-## Download Dataset
+### Download Dataset
 Download the precompiled MultiCorrupt dataset from 
 [Huggingface](https://huggingface.co/datasets/TillBeemelmanns/MultiCorrupt) 
 and put it in the data folder.

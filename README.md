@@ -22,7 +22,24 @@
 
 -------------------------------
 
+<!-- omit in toc -->
 ### [Paper](https://arxiv.org/) | [Video](https://www.youtube.com) | [Dataset](https://huggingface.co/datasets/TillBeemelmanns/MultiCorrupt)
+
+
+<!-- omit in toc -->
+### Outline
+- [News](#news)
+- [Introduction](#introduction)
+- [Method](#method)
+- [Demo](#demo)
+- [Getting Started](#getting-started)
+- [Quick Start](#quick-start)
+  - [1. Fit GMM](#1-fit-gmm)
+  - [2. Evaluate](#2-evaluate)
+  - [3. Generate Video](#3-generate-video)
+- [TODOs](#todos)
+- [Acknowledgement](#acknowledgement)
+- [Citation](#citation)
 
 
 ## News
@@ -54,10 +71,13 @@ module into the prediction head.
 
 ## Demo  
 ![](assets/color_bar.png)
+<!-- omit in toc -->
 ---------------------------------------
 ![Motorcycle](assets/demo_construction_truck.gif)
+<!-- omit in toc -->
 ---------------------------------------
 ![Scooter](assets/demo_weird_scooter.gif)
+<!-- omit in toc -->
 ---------------------------------------
 ![Motorcycle Overtaking](assets/demo_motorcycle_overtaking.gif)
 ![](assets/bar.jpg)
@@ -144,7 +164,7 @@ We thank the BMBF and EU for funding this project:
 > This work has received funding from the [European Union’s Horizon Europe Research and Innovation Programme](https://research-and-innovation.ec.europa.eu/funding/funding-opportunities/funding-programmes-and-open-calls/horizon-europe_en) under Grant Agreement No. 101076754 - [AIthena project](https://aithena.eu/). The project was partially funded by the [BMBF](https://www.bmbf.de/) project “WestAI” (grant no. 01IS22094D)
 
 
-## Bibtex
+## Citation
 If this work is helpful for your research, please consider citing this work:
 
 ```

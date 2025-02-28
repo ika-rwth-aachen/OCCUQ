@@ -1,4 +1,16 @@
+<!-- omit in toc -->
 # RUN OCCUQ
+
+<!-- omit in toc -->
+# Outline
+- [Download trained models and GMM](#download-trained-models-and-gmm)
+- [Train \& Test OCCUQ](#train--test-occuq)
+  - [Train OCCUQ Model with 4 A100 GPUs](#train-occuq-model-with-4-a100-gpus)
+  - [Train GMM with 1 A100 GPU](#train-gmm-with-1-a100-gpu)
+  - [Evaluate OCCUQ with 1 A100 GPU](#evaluate-occuq-with-1-a100-gpu)
+  - [Video Generation](#video-generation)
+  - [MultiCorrupt Evaluation](#multicorrupt-evaluation)
+
 
 ## Download trained models and GMM
 Download and unzip weights and GMM to `work_dirs` to obtain the following structure:
