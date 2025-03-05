@@ -61,4 +61,26 @@ to generate the dataset on your own, by corrupting the original nuScenes dataset
 ### Download Dataset
 Download the precompiled MultiCorrupt dataset from 
 [Huggingface](https://huggingface.co/datasets/TillBeemelmanns/MultiCorrupt) 
-and put it in the data folder.
+and extract the compressed dataset with the following script:
+
+```bash
+#!/bin/bash
+
+# Set directories
+compressed_dir="multicorrupt"
+destination_dir="multicorrupt_uncompressed"
+mkdir -p "$destination_dir"
+
+# Iterate over all split archives
+for archive in "$compressed_dir"/*.tar.gz.part00; do
+    base_name=$(basename "$archive" .tar.gz.part00)
+    category=$(echo "$base_name" | cut -d'_' -f1)
+    subfolder=$(echo "$base_name" | cut -d'_' -f2)
+    
+    # Create category directory if it doesn't exist
+    mkdir -p "$destination_dir/$category/$subfolder"
+    
+    echo "Reconstructing and extracting $base_name..."
+    cat "$compressed_dir/${base_name}.tar.gz.part"* | tar -xzvf - -C "$destination_dir/$category/$subfolder"
+done
+```
