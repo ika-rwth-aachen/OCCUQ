@@ -1,0 +1,22 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "GMM Eval",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "tools/gmm_evaluate.py",
+            "console": "integratedTerminal",
+            "env": {
+                "CUDA_VISIBLE_DEVICES": "0",
+                "PYTHONPATH": "tools:${env:PYTHONPATH}"
+            },
+            "args": [
+                "/workspace/projects/configs/occuq/occuq_mlpv5_sn.py",
+                "/workspace/work_dirs/occuq_mlpv5_sn/epoch_6.pth",
+                "--eval",
+                "bbox"
+            ]
+        }
+    ]
+}
