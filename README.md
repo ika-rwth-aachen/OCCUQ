@@ -4,10 +4,10 @@
   <h3 align="center"><strong>OCCUQ: Efficient Uncertainty Quantification for 3D Occupancy Prediction</strong></h3>
 
   <p align="center">
-      <a href="" target='_blank'>Severin Heidrich*</a><sup>1</sup>&nbsp;&nbsp;
+      <a href="https://github.com/SeverinHeidrich" target='_blank'>Severin Heidrich*</a><sup>1</sup>&nbsp;&nbsp;
       <a href="https://github.com/TillBeemelmanns" target='_blank'>Till Beemelmanns*</a><sup>1</sup>&nbsp;&nbsp;
       <a href="https://github.com/kumuji" target='_blank'>Alexey Nekrasov*</a><sup>2</sup>&nbsp;&nbsp;
-      <a href="" target='_blank'>Bastian Leibe</a><sup>2</sup>&nbsp;&nbsp;
+      <a href="https://www.vision.rwth-aachen.de/" target='_blank'>Bastian Leibe</a><sup>2</sup>&nbsp;&nbsp;
       <a href="https://www.ika.rwth-aachen.de/de/institut/team/univ-prof-dr-ing-lutz-eckstein.html" target='_blank'>Lutz Eckstein</a><sup>1</sup>&nbsp;&nbsp;
     <br>
     <small><sup>1</sup>Institute for Automotive Engineering, RWTH Aachen University, Germany&nbsp;&nbsp;</small>
@@ -93,8 +93,8 @@ module into the prediction head.
 
 
 ### 1. Fit GMM
-Download [trained model](https://rwth-aachen.sciebo.de/s/2o1LOb4PwFbPzSb)) 
-and fit the Gaussian Mixture Model (GMM) for uncertainty estimation, run
+Download the [trained model](https://rwth-aachen.sciebo.de/s/2o1LOb4PwFbPzSb)
+and fit the Gaussian Mixture Model (GMM) for uncertainty estimation. Run
 `gmm_fit.py` with the following command:
 
 
