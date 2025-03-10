@@ -8,24 +8,19 @@
 #  by Severin Heidrich, Till Beemelmanns, Alexey Nekrasov
 # ---------------------------------------------
 
-#import open3d as o3d
-from tkinter.messagebox import NO
+
 import torch
 from mmcv.runner import force_fp32, auto_fp16
 from mmdet.models import DETECTORS
-from mmdet3d.core import bbox3d2result
 from mmdet3d.models.detectors.mvx_two_stage import MVXTwoStageDetector
 from projects.mmdet3d_plugin.models.utils.grid_mask import GridMask
 import time
 import copy
 import numpy as np
-import mmdet3d
-from projects.mmdet3d_plugin.models.utils.bricks import run_time
-from projects.mmdet3d_plugin.datasets.evaluation_metrics import evaluation_reconstruction, evaluation_semantic
-from sklearn.metrics import confusion_matrix as CM
-import time, yaml, os
-import torch.nn as nn
+from projects.mmdet3d_plugin.datasets.evaluation_metrics import evaluation_semantic
+import time, os
 import csv
+
 
 def entropy_prob(probs):
     logp = torch.log(probs + 1e-12)
