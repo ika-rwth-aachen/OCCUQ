@@ -7,7 +7,7 @@ config=/workspace/projects/configs/occuq/occuq_mlpv5_sn.py
 weight=/workspace/work_dirs/occuq_mlpv5_sn/epoch_6.pth
 
 
-# Clean Evaluation
+# Clean Video
 python tools/gmm_video.py \
 $config \
 $weight \
@@ -15,7 +15,7 @@ $weight \
 
 # MultiCorrupt
 corruptions=("snow" "fog" "motionblur" "brightness" "missingcamera")
-levels=("3" "2" "1")
+levels=("1" "2" "3")
 
 for corruption in "${corruptions[@]}"; do
     for level in "${levels[@]}"; do
