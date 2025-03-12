@@ -135,11 +135,11 @@ levels `1`, `2` and `3`. Then, we evaluate the OOD detection performance using
 
 <!-- omit in toc -->
 #### Resolution 200x200x16 (Scale 3)
-| Measure           | mAUROC | mAUPR | mFPR95 |
-|-------------------|--------|-------|--------|
-| Softmax Entropy   | 54.63  | 56.21 | 94.47  |
-| Max. Softmax      | 56.16  | 57.52 | 93.17  |
-| GMM (Ours)        | 80.15  | 79.43 | 56.18  |
+| Measure           | mAUROC ⬆️  | mAUPR ⬆️ | mFPR95 ⬇️ |
+|-------------------|------------|----------|-----------|
+| Softmax Entropy   | 54.63      | 56.21    | 94.47     |
+| Max. Softmax      | 56.16      | 57.52    | 93.17     |
+| GMM (Ours)        | 80.15      | 79.43    | 56.18     |
 
 Note: After refactoring the code and retraining the GMM, we obtained slight
 different results compared to the values reported in our paper.
