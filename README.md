@@ -133,7 +133,8 @@ script where we perform step 1. and 2. and then iterate over the corruptions
 levels 1, 2 and 3. Then, we evaluate the OOD detection performance using
 [scripts/ood_detection_evaluation.py](scripts/ood_detection_evaluation.py).
 
-
+<!-- omit in toc -->
+#### Resolution 200x200x16 (Scale 3)
 | Measure           | mAUROC | mAUPR | mFPR95 |
 |-------------------|--------|-------|--------|
 | Softmax Entropy   | 54.63  | 56.21 | 94.47  |
