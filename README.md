@@ -145,6 +145,7 @@ levels 1, 2 and 3. Then, we evaluate the OOD detection performance using
 | Softmax Entropy   | 54.63  | 56.21 | 94.47  |
 | Max. Softmax      | 56.16  | 57.52 | 93.17  |
 | GMM (Ours)        | 80.15  | 79.43 | 56.18  |
+
 Note: After refactoring the code and retraining the GMM we obtained slight
 different results compared to the paper.
 
@@ -171,6 +172,8 @@ More instructions will follow soon.
 
 ## TODOs
 - [x] Upload MultiCorrupt dataset for evaluation
+- [ ] Explain which corruptions were used for the paper (no darkness as it already appears in the training dataset)
+- [ ] Explain GMM GPU inference
 - [ ] Add scripts for OOD detection
 - [ ] Add scripts for Region OOD Detection
 - [ ] Add Monte Carlo Dropout and Deep Ensembles
