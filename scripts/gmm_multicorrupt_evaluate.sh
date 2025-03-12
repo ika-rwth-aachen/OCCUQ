@@ -35,7 +35,7 @@ python scripts/ood_detection_evaluation.py \
 --work_dirs /workspace/work_dirs/occuq_mlpv5_sn
 
 
-# Mean Evaluation
+# Mean across all corruptions and levels
 #         Measure  mAUROC  mAUPR  mFPR95
 #             GMM   80.15  79.43   56.18
 # Softmax Entropy   54.63  56.21   94.47
