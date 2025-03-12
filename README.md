@@ -35,8 +35,9 @@
 - [Getting Started](#getting-started)
 - [Quick Start](#quick-start)
   - [1. Fit GMM](#1-fit-gmm)
-  - [2. Evaluate](#2-evaluate)
-  - [3. Generate Video](#3-generate-video)
+  - [2. Inference](#2-inference)
+  - [3. OOD Detection](#3-ood-detection)
+  - [4. Generate Video](#4-generate-video)
 - [TODOs](#todos)
 - [Acknowledgement](#acknowledgement)
 - [Citation](#citation)
@@ -112,8 +113,9 @@ $weight \
 ```
 
 
-### 2. Evaluate
-Once the GMM is fitted, you can evaluate the model using the following command:
+### 2. Inference
+Once the GMM is fitted, you can run inference of the model with GMM Uncertainty
+Quantification using the following command:
 
 ```bash
 export CUDA_VISIBLE_DEVICES=0
@@ -129,7 +131,25 @@ $weight \
 ```
 
 
-### 3. Generate Video
+### 3. OOD Detection
+To generate the **OOD detection** results as in the paper for OCCUQ, you 
+can check out the [gmm_multicorrupt_evaluate.sh](scripts/gmm_multicorrupt_evaluate.sh)
+script where we perfrom step 1. and 2. and then iterate over the corruptions
+`snow`, `fog`, `motionblur`, `brightness` and `missingcamera`, each with severity
+levels 1, 2 and 3. Then, we evaluate the OOD detection performance using
+[scripts/ood_detection_evaluation.py](scripts/ood_detection_evaluation.py).
+
+
+| Measure           | mAUROC | mAUPR | mFPR95 |
+|-------------------|--------|-------|--------|
+| Softmax Entropy   | 54.63  | 56.21 | 94.47  |
+| Max. Softmax      | 56.16  | 57.52 | 93.17  |
+| GMM (Ours)        | 80.15  | 79.43 | 56.18  |
+Note: After refactoring the code and retraining the GMM we obtained slight
+different results compared to the paper.
+
+
+### 4. Generate Video
 For video generation, run the following command:
 
 ```bash
@@ -144,6 +164,10 @@ $config \
 $weight \
 --eval bbox
 ```
+
+We generated Voxel Visualizations with (Mayavi)[https://github.com/enthought/mayavi].
+More instructions will follow soon.
+
 
 ## TODOs
 - [x] Upload MultiCorrupt dataset for evaluation
