@@ -5,17 +5,20 @@ export PYTHONPATH=$PYTHONPATH:/workspace
 
 config=/workspace/projects/configs/occuq/occuq_mlpv5_sn.py
 weight=/workspace/work_dirs/occuq_mlpv5_sn/epoch_6.pth
+scale=3
 
 python tools/gmm_fit.py \
 $config \
 $weight \
---eval bbox
+--eval bbox \
+--feature_scale_lvl $scale
 
 # Clean Evaluation
 python tools/gmm_evaluate.py \
 $config \
 $weight \
---eval bbox
+--eval bbox \
+--feature_scale_lvl $scale
 
 # MultiCorrupt Evaluation
 corruptions=("snow" "fog" "motionblur" "brightness" "missingcamera")
@@ -27,12 +30,14 @@ for corruption in "${corruptions[@]}"; do
         $config \
         $weight \
         --eval bbox \
-        --overwrite_nuscenes_root=/workspace/multicorrupt/$corruption/$level
+        --overwrite_nuscenes_root=/workspace/multicorrupt/$corruption/$level \
+        --feature_scale_lvl $scale
     done
 done
 
 python scripts/ood_detection_evaluation.py \
---work_dirs /workspace/work_dirs/occuq_mlpv5_sn
+--work_dirs /workspace/work_dirs/occuq_mlpv5_sn \
+feature_scale_lvl $scale
 
 
 # Mean across all corruptions and levels
