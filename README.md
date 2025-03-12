@@ -118,12 +118,6 @@ Once the GMM is fitted, you can run inference of the model with GMM Uncertainty
 Quantification using the following command:
 
 ```bash
-export CUDA_VISIBLE_DEVICES=0
-export PYTHONPATH=$PYTHONPATH:/workspace
-
-config=/workspace/projects/configs/occuq/occuq_mlpv5_sn.py 
-weight=/workspace/work_dirs/occuq_mlpv5_sn/epoch_6.pth
-
 python tools/gmm_evaluate.py \
 $config \
 $weight \
@@ -134,7 +128,7 @@ $weight \
 ### 3. OOD Detection
 To generate the **OOD detection** results as in the paper for OCCUQ, you 
 can check out the [gmm_multicorrupt_evaluate.sh](scripts/gmm_multicorrupt_evaluate.sh)
-script where we perfrom step 1. and 2. and then iterate over the corruptions
+script where we perform step 1. and 2. and then iterate over the corruptions
 `snow`, `fog`, `motionblur`, `brightness` and `missingcamera`, each with severity
 levels 1, 2 and 3. Then, we evaluate the OOD detection performance using
 [scripts/ood_detection_evaluation.py](scripts/ood_detection_evaluation.py).
@@ -154,12 +148,6 @@ different results compared to the paper.
 For video generation, run the following command:
 
 ```bash
-export CUDA_VISIBLE_DEVICES=0
-export PYTHONPATH=$PYTHONPATH:/workspace
-
-config=/workspace/projects/configs/occuq/occuq_mlpv5_sn.py 
-weight=/workspace/work_dirs/occuq_mlpv5_sn/epoch_6.pth
-
 python tools/gmm_video.py \
 $config \
 $weight \
@@ -172,22 +160,22 @@ We generated voxel visualizations as in the videos with
 
 ## TODOs
 - [x] Upload MultiCorrupt dataset for evaluation
+- [X] Add scripts for OOD detection
 - [ ] Explain which corruptions were used
 - [ ] Explain GMM GPU inference
-- [X] Add scripts for OOD detection
 - [ ] Add scripts for Region OOD Detection
 - [ ] Add Monte Carlo Dropout and Deep Ensembles
 - [ ] Add Uncertainty Guided Temperature Scaling (UGTS)
 
 
 ## Acknowledgement
-Many thanks to these excellent projects:
+Many thanks to these excellent projects ❤️
 - [SurroundOCC](https://github.com/weiyithu/SurroundOcc)
 - [Deep Deterministic Uncertainty](https://github.com/omegafragger/DDU)
 - [MultiCorrupt](https://github.com/ika-rwth-aachen/MultiCorrupt)
 - [OpenMMLab](https://github.com/open-mmlab)
 
-We thank the BMBF and EU for funding this project:
+We thank the BMBF and EU for funding this project ❤️
 > This work has received funding from the [European Union’s Horizon Europe Research and Innovation Programme](https://research-and-innovation.ec.europa.eu/funding/funding-opportunities/funding-programmes-and-open-calls/horizon-europe_en) under Grant Agreement No. 101076754 - [AIthena project](https://aithena.eu/). The project was partially funded by the [BMBF](https://www.bmbf.de/) project “WestAI” (grant no. 01IS22094D)
 
 

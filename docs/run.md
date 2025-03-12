@@ -6,8 +6,8 @@
 - [Download trained models and GMM](#download-trained-models-and-gmm)
 - [Train \& Test OCCUQ](#train--test-occuq)
   - [Train OCCUQ Model with 4 A100 GPUs](#train-occuq-model-with-4-a100-gpus)
-  - [Train GMM with 1 A100 GPU](#train-gmm-with-1-a100-gpu)
-  - [Evaluate OCCUQ with 1 A100 GPU](#evaluate-occuq-with-1-a100-gpu)
+  - [Train GMM with one A100 GPU](#train-gmm-with-one-a100-gpu)
+  - [Evaluate OCCUQ with one A100 GPU](#evaluate-occuq-with-one-a100-gpu)
   - [Video Generation](#video-generation)
   - [MultiCorrupt Evaluation](#multicorrupt-evaluation)
 
@@ -16,7 +16,6 @@
 Download and unzip weights and GMM to `work_dirs` to obtain the following structure:
 
 [Download Link](https://rwth-aachen.sciebo.de/s/2o1LOb4PwFbPzSb)
-
 
 ```
 work_dirs
@@ -53,7 +52,7 @@ export PYTHONPATH=$PYTHONPATH:/workspace
 ```
 
 
-### Train GMM with 1 A100 GPU
+### Train GMM with one A100 GPU
 ```bash
 python tools/gmm_fit.py \
 $config \
@@ -62,7 +61,7 @@ $weight \
 ```
 
 
-### Evaluate OCCUQ with 1 A100 GPU
+### Evaluate OCCUQ with one A100 GPU
 ```bash
 export CUDA_VISIBLE_DEVICES=0
 export PYTHONPATH=$PYTHONPATH:/workspace
@@ -115,7 +114,7 @@ $weight \
 
 # MultiCorrupt Evaluation
 corruptions=("snow" "fog" "motionblur" "brightness" "missingcamera")
-levels=("3" "2" "1")
+levels=("1" "2" "3")
 
 for corruption in "${corruptions[@]}"; do
     for level in "${levels[@]}"; do
@@ -126,4 +125,7 @@ for corruption in "${corruptions[@]}"; do
         --overwrite_nuscenes_root=/workspace/multicorrupt/$corruption/$level
     done
 done
+
+python scripts/ood_detection_evaluation.py \
+--work_dirs /workspace/work_dirs/occuq_mlpv5_sn
 ```
