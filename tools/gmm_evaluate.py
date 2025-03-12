@@ -22,9 +22,7 @@ from mmdet3d.models import build_model
 from mmdet.apis import set_random_seed
 from mmdet.datasets import replace_ImageToTensor
 
-from tools.gmm_utils import gmm_evaluate, entropy_prob
-from netcal.metrics import ECE
-from prettytable import PrettyTable
+from tools.gmm_utils import gmm_evaluate
 
 
 def parse_args():
