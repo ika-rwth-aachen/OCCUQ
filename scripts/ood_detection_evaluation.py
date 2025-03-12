@@ -17,12 +17,12 @@ def calculate_auroc(predictions, targets):
     return roc_auc, fpr_best, threshold
 
 
-def main(work_dirs):
+def main(work_dirs, feature_scale_lvl):
     corruption_types = ["snow", "fog", "motionblur", "brightness", "missingcamera"]
     corruptions = [f"{corruption}_{i}" for corruption in corruption_types for i in range(1, 4)]
     measures = ["gmm_uncertainty_per_sample", "softmax_entropy_per_sample", "max_softmax_per_sample"]
     nice_measure_names = ["GMM", "Softmax Entropy", "Max Softmax"]
-    scale = "_scale3"
+    scale = f"_scale{feature_scale_lvl}"
     all_corruptions_available = True
 
     results = []
@@ -80,5 +80,11 @@ if __name__ == '__main__':
         default='/workspace/work_dirs/occuq_mlpv5_sn',
         help='Working directories'
     )
+    parser.add_argument(
+        '--feature_scale_lvl',
+        type=int,
+        default=3,
+        help='Feature scale level'
+    )
     args = parser.parse_args()
-    main(args.work_dirs)
+    main(args.work_dirs, args.feature_scale_lvl)
