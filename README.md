@@ -130,7 +130,7 @@ To generate the **OOD detection** results as in the paper for OCCUQ, you
 can check out the [gmm_multicorrupt_evaluate.sh](scripts/gmm_multicorrupt_evaluate.sh)
 script where we perform step 1. and 2. and then iterate over the corruptions
 `snow`, `fog`, `motionblur`, `brightness` and `missingcamera`, each with severity
-levels 1, 2 and 3. Then, we evaluate the OOD detection performance using
+levels `1`, `2` and `3`. Then, we evaluate the OOD detection performance using
 [scripts/ood_detection_evaluation.py](scripts/ood_detection_evaluation.py).
 
 <!-- omit in toc -->
@@ -141,8 +141,8 @@ levels 1, 2 and 3. Then, we evaluate the OOD detection performance using
 | Max. Softmax      | 56.16  | 57.52 | 93.17  |
 | GMM (Ours)        | 80.15  | 79.43 | 56.18  |
 
-Note: After refactoring the code and retraining the GMM we obtained slight
-different results compared to the paper.
+Note: After refactoring the code and retraining the GMM, we obtained slight
+different results compared to the values reported in our paper.
 
 
 ### 4. Generate Video
