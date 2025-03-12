@@ -166,15 +166,15 @@ $weight \
 --eval bbox
 ```
 
-We generated Voxel Visualizations with (Mayavi)[https://github.com/enthought/mayavi].
-More instructions will follow soon.
+We generated voxel visualizations as in the videos with
+[Mayavi](https://github.com/enthought/mayavi). More instructions will follow soon.
 
 
 ## TODOs
 - [x] Upload MultiCorrupt dataset for evaluation
-- [ ] Explain which corruptions were used for the paper (no darkness as it already appears in the training dataset)
+- [ ] Explain which corruptions were used
 - [ ] Explain GMM GPU inference
-- [ ] Add scripts for OOD detection
+- [X] Add scripts for OOD detection
 - [ ] Add scripts for Region OOD Detection
 - [ ] Add Monte Carlo Dropout and Deep Ensembles
 - [ ] Add Uncertainty Guided Temperature Scaling (UGTS)
