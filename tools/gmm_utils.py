@@ -4,12 +4,44 @@
 # Copyright (c) 2025 Computer Vision Group of RWTH Aachen University
 # by Severin Heidrich, Till Beemelmanns, Alexey Nekrasov
 
+import math
 import numpy as np
 import torch
+from torch import jit
 from tqdm import tqdm
 
 DOUBLE_INFO = torch.finfo(torch.double)
 JITTERS = [0, DOUBLE_INFO.tiny] + [10 ** exp for exp in range(-308, 0, 1)]
+
+
+@jit.script
+def jit_log_prob(
+    x: torch.Tensor,
+    means: torch.Tensor,
+    precisions_cholesky: torch.Tensor
+    ) -> torch.Tensor:
+    
+    log_prob = x.new_empty((x.size(0), means.size(0)))
+    for k, (mu, prec_chol) in enumerate(zip(means, precisions_cholesky)):
+        inner = x.matmul(prec_chol) - mu.matmul(prec_chol)
+        log_prob[:, k] = inner.square().sum(1)
+
+    num_features = x.size(1)
+    logdet = precisions_cholesky.diagonal(dim1=-2, dim2=-1).log().sum(-1)
+    constant = math.log(2 * math.pi) * num_features
+    return logdet - 0.5 * (constant + log_prob)
+
+
+def means_precisions_cholesky(gmm):
+    means = gmm.loc
+    covariance_matrix = gmm.covariance_matrix
+
+    target = torch.eye(covariance_matrix.size(-1), dtype=covariance_matrix.dtype, device=covariance_matrix.device)
+    target = target.unsqueeze(0).expand(covariance_matrix.size(0), -1, -1)
+    cholesky_decomp = torch.linalg.cholesky(covariance_matrix)
+    precisions_cholesky = torch.inverse(cholesky_decomp).matmul(target.transpose(-2, -1)).transpose(-2, -1)
+
+    return means, precisions_cholesky
 
 
 def entropy_prob(probs):
@@ -40,10 +72,9 @@ def get_features_balanced(
         model,
         data_loader,
         dtype,
-        storage_device,
         max_features_per_class,
         max_collect_features_per_class_per_frame,
-        feature_scale_lvl=3
+        feature_scale_lvl
     ):
     cls_names = ['unoccupied'] + data_loader.dataset.class_names
     cls_count = {} # Dictionary to keep count of features per class
@@ -64,7 +95,7 @@ def get_features_balanced(
             output = model.module.pts_bbox_head.feature
             
             pred = model.module.pred.permute(0, 2, 3, 4, 1)
-            pred_ids = pred.max(-1)[1].to(device=storage_device)
+            pred_ids = pred.max(-1)[1].cpu()
             gt_occ = data['gt_occ'][0]
             
             scale_ratio = 2**(len(output) - 1 - feature_scale_lvl)
@@ -93,8 +124,8 @@ def get_features_balanced(
                         num_features_to_add = torch.sum(class_filter)
                         num_features_to_add = torch.clamp(num_features_to_add, max=max_collect_features_per_class_per_frame)
                     
-                    feature_per_label = feature[class_filter].to(dtype=dtype, device=storage_device)
-                    label_per_feature = label[class_filter].to(dtype=torch.uint8, device=storage_device)
+                    feature_per_label = feature[class_filter].to(dtype=dtype, device='cpu')
+                    label_per_feature = label[class_filter].to(dtype=torch.uint8, device='cpu')
                     
                     # Shuffle the features to add
                     feature_idx = np.arange(feature_per_label.shape[0])
@@ -189,19 +220,24 @@ def get_prior_log_prob(labels, num_classes):
     return torch.log(class_counts.float() / total_samples)
 
 
-def gmm_evaluate(model, gmm, data_loader, num_classes, device, feature_scale_lvl=3):
+def gmm_analyze(model, gmm, data_loader, num_classes, feature_scale_lvl):
     num_voxels_per_scale = {
         3: 200*200*16,
         2: 100*100*8,
         1: 50*50*4,
         0: 25*25*2,
     }[feature_scale_lvl]
+
+    # for fast GMM evaluation on GPU
+    means, precisions_cholesky = means_precisions_cholesky(gmm)
+    means = means.cuda()
+    precisions_cholesky = precisions_cholesky.cuda()
     
     num_samples = len(data_loader.dataset)
 
-    log_probs = torch.empty((num_samples, num_voxels_per_scale, num_classes), dtype=torch.float32, device=device)
-    logits = torch.empty((num_samples, num_voxels_per_scale, num_classes), dtype=torch.float32, device=device)
-    labels = torch.empty((num_samples, num_voxels_per_scale), dtype=torch.int, device=device)
+    log_probs = torch.empty((num_samples, num_voxels_per_scale, num_classes), dtype=torch.float32)
+    logits = torch.empty((num_samples, num_voxels_per_scale, num_classes), dtype=torch.float32)
+    labels = torch.empty((num_samples, num_voxels_per_scale), dtype=torch.int)
     sample_name = []
 
     for i, data in enumerate(tqdm(data_loader)):
@@ -214,11 +250,12 @@ def gmm_evaluate(model, gmm, data_loader, num_classes, device, feature_scale_lvl
             scale_ratio = 2**(len(model.module.logits) - 1 - feature_scale_lvl)
             label = multiscale_supervision(data['gt_occ'].clone(), scale_ratio, feature.shape)
 
-            feature = torch.flatten(feature, 0, 3).to(device)
-            label = torch.flatten(label).to(device)
-            logit = torch.flatten(logit, 0, 3).to(device)
+            feature = torch.flatten(feature, 0, 3)
+            label = torch.flatten(label).cpu()
+            logit = torch.flatten(logit, 0, 3).cpu()
             
-            log_prob = gmm.log_prob(feature[:, None, :])
+            # fast GMM evaluation on GPU
+            log_prob = jit_log_prob(feature, means, precisions_cholesky).cpu()
 
             log_probs[i, :, :] = log_prob
             logits[i, :, :] = logit
@@ -228,3 +265,45 @@ def gmm_evaluate(model, gmm, data_loader, num_classes, device, feature_scale_lvl
 
     return log_probs, logits, labels, sample_name
 
+
+def gmm_evaluate(model, gmm, prior_log_prob, data_loader, feature_scale_lvl):
+    # for fast GMM evaluation on GPU
+    means, precisions_cholesky = means_precisions_cholesky(gmm)
+    means = means.cuda()
+    precisions_cholesky = precisions_cholesky.cuda()
+
+    prior_log_prob = prior_log_prob.cuda()
+    
+    gmm_uncertainty_per_sample = []
+    softmax_entropy_per_sample = []
+    max_softmax_per_sample = []
+    for data in tqdm(data_loader):
+        with torch.no_grad():
+            model(return_loss=False, rescale=True, **data)
+
+            feature = model.module.pts_bbox_head.feature[feature_scale_lvl]
+            logit = model.module.logits[feature_scale_lvl].permute(0, 2, 3, 4, 1)
+
+            feature = torch.flatten(feature, 0, 3)
+            logit = torch.flatten(logit, 0, 3)
+            
+            # fast GMM evaluation on GPU
+            log_prob = jit_log_prob(feature, means, precisions_cholesky)
+            
+            torch.clamp(log_prob, min=-100000, max=100000)
+            
+            # log(z,y) + log(y)
+            log_prob = log_prob + prior_log_prob
+
+            # log q(z)
+            gmm_uncertainty = torch.logsumexp(log_prob, dim=-1)
+            gmm_uncertainty_per_sample.append(gmm_uncertainty.mean().cpu().item())
+            
+            softmax = torch.softmax(logit, dim=-1)
+            softmax_entropy = entropy_prob(softmax)
+            softmax_entropy_per_sample.append(softmax_entropy.mean().cpu().item())
+            
+            max_softmax = torch.max(softmax, dim=-1)[0]
+            max_softmax_per_sample.append(max_softmax.mean().cpu().item())
+            
+    return gmm_uncertainty_per_sample, softmax_entropy_per_sample, max_softmax_per_sample

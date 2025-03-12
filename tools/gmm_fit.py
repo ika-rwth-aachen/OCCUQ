@@ -5,25 +5,19 @@
 # by Severin Heidrich, Till Beemelmanns, Alexey Nekrasov
 
 import argparse
-import mmcv
 import os
-import random
-import numpy as np
 import torch
 import warnings
-import matplotlib.pyplot as plt
 from mmcv import Config, DictAction
 from mmcv.cnn import fuse_conv_bn
-from mmcv.parallel import MMDataParallel, MMDistributedDataParallel
-from mmcv.runner import (get_dist_info, init_dist, load_checkpoint,
+from mmcv.parallel import MMDataParallel
+from mmcv.runner import (init_dist, load_checkpoint,
                          wrap_fp16_model)
 
-from mmdet3d.apis import single_gpu_test
 from mmdet3d.datasets import build_dataset
 from projects.mmdet3d_plugin.datasets.builder import build_dataloader
 from mmdet3d.models import build_model
 from mmdet.apis import set_random_seed
-from projects.mmdet3d_plugin.surroundocc.apis.test import custom_multi_gpu_test
 from mmdet.datasets import replace_ImageToTensor
 
 from tools.gmm_utils import gmm_fit, get_features_balanced, get_prior_log_prob
@@ -239,8 +233,8 @@ def main():
     
     model = MMDataParallel(model, device_ids=[0])
     model.eval()
+
     num_classes = 1 + len(dataset.class_names)
-    storage_device = torch.device('cpu')
     dtype = torch.float32
     feature_scale_lvl = args.feature_scale_lvl
 
@@ -248,7 +242,6 @@ def main():
         model=model,
         data_loader=data_loader,
         dtype=dtype,
-        storage_device=storage_device,
         max_features_per_class=200000000,
         max_collect_features_per_class_per_frame=100000,
         feature_scale_lvl=feature_scale_lvl

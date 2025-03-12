@@ -3,53 +3,28 @@
 # Copyright (c) 2025 Institute for Automotive Engineering of RWTH Aachen University
 # Copyright (c) 2025 Computer Vision Group of RWTH Aachen University
 # by Severin Heidrich, Till Beemelmanns, Alexey Nekrasov
+
 import argparse
-import mmcv
 import os
-from tqdm import tqdm
 import numpy as np
 import torch
 import warnings
 import matplotlib.pyplot as plt
 from mmcv import Config, DictAction
 from mmcv.cnn import fuse_conv_bn
-from mmcv.parallel import MMDataParallel, MMDistributedDataParallel
-from mmcv.runner import (get_dist_info, init_dist, load_checkpoint,
+from mmcv.parallel import MMDataParallel
+from mmcv.runner import (init_dist, load_checkpoint,
                          wrap_fp16_model)
 
-from mmdet3d.apis import single_gpu_test
 from mmdet3d.datasets import build_dataset
 from projects.mmdet3d_plugin.datasets.builder import build_dataloader
 from mmdet3d.models import build_model
 from mmdet.apis import set_random_seed
-from projects.mmdet3d_plugin.surroundocc.apis.test import custom_multi_gpu_test
 from mmdet.datasets import replace_ImageToTensor
 
-from tools.gmm_utils import gmm_evaluate
+from tools.gmm_utils import gmm_evaluate, entropy_prob
 from netcal.metrics import ECE
-from netcal.presentation import ReliabilityDiagram
 from prettytable import PrettyTable
-
-CLASS_NAMES = ['IoU','barrier','bicycle', 'bus', 'car', 'construction_vehicle',
-               'motorcycle', 'pedestrian', 'traffic_cone', 'trailer', 'truck',
-               'driveable_surface', 'other_flat', 'sidewalk', 'terrain',
-               'manmade', 'vegetation']
-
-INTERESTING_SAMPLES = ["n015-2018-07-11-11-54-16+0800__LIDAR_TOP__1531281624399157.pcd.bin"]
-
-def count_parameters(model, print_table=True):
-    table = PrettyTable(["Modules", "Parameters"])
-    total_params = 0
-    for name, parameter in model.named_parameters():
-        if not parameter.requires_grad:
-            continue
-        params = parameter.numel()
-        table.add_row([name, params])
-        total_params += params
-    if print_table:
-        print(table)
-    print(f"Total Trainable Params: {total_params}")
-    return total_params
 
 
 def parse_args():
@@ -128,7 +103,6 @@ def parse_args():
         type=str,
         default=None,
         help='overwrite the nuscenes root path in the config file')
-    # paser for feature_scale_lvl
     parser.add_argument(
         '--feature_scale_lvl',
         type=int,
@@ -231,7 +205,6 @@ def main():
     if args.seed is not None:
         set_random_seed(args.seed, deterministic=args.deterministic)
 
-
     # build the dataloader
     cfg.data.test['overwrite_nuscenes_root'] = args.overwrite_nuscenes_root
     # cfg.data.test["overwrite_nuscenes_root_for_cameras"] = ["CAM_FRONT"]
@@ -249,7 +222,6 @@ def main():
     # build the model and load checkpoint
     cfg.model.train_cfg = None
     model = build_model(cfg.model, test_cfg=cfg.get('test_cfg'))
-    count_parameters(model, print_table=False)
     fp16_cfg = cfg.get('fp16', None)
     if fp16_cfg is not None:
         wrap_fp16_model(model)
@@ -275,289 +247,60 @@ def main():
     model = MMDataParallel(model, device_ids=[0])
     model.eval()
     
-    num_samples = len(data_loader)
-    num_classes = 1 + len(dataset.class_names)
-    device = torch.device('cpu')
     feature_scale_lvl = args.feature_scale_lvl
     
-    wl = {
-        3: 200,
-        2: 100,
-        1: 50,
-        0: 25
-    }[feature_scale_lvl]
-    h = {
-        3: 16,
-        2: 8,
-        1: 4,
-        0: 2
-    }[feature_scale_lvl]
-    
-    multivariate = torch.load(
-        os.path.join(os.path.dirname(args.checkpoint), f'train_gmm_scale_{feature_scale_lvl}.pt'),
-        map_location=device
+    gmm = torch.load(
+        os.path.join(os.path.dirname(args.checkpoint), f'train_gmm_scale_{feature_scale_lvl}.pt')
     )
-    
-    gmm = torch.distributions.MultivariateNormal(
-        loc=multivariate.loc,
-        scale_tril=torch.linalg.cholesky(multivariate.covariance_matrix)
-    )
-    
     prior_log_prob = torch.load(
-        os.path.join(os.path.dirname(args.checkpoint), f'train_prior_log_prob_scale_{feature_scale_lvl}.pt'),
-        map_location=device
+        os.path.join(os.path.dirname(args.checkpoint), f'train_prior_log_prob_scale_{feature_scale_lvl}.pt')
     )
 
-    log_prob, logits, label_cls_ids, sample_names = gmm_evaluate(
+    gmm_uncertainty_per_sample, softmax_entropy_per_sample, max_softmax_per_sample = gmm_evaluate(
         model=model,
         gmm=gmm,
+        prior_log_prob=prior_log_prob,
         data_loader=data_loader,
-        num_classes=num_classes,
-        device=device,
         feature_scale_lvl=feature_scale_lvl,
     )
 
-    # some values are -inf, set all -inf values to minimal finite number
-    log_prob = torch.clamp(log_prob, min=-100000, max=100000)
-    
-    # log(z,y) + log(y)
-    log_prob = log_prob + prior_log_prob
-    
-    # log q(z)
-    gmm_uncertainty = torch.logsumexp(log_prob, dim=-1)
-    gmm_uncertainty_per_sample = torch.mean(gmm_uncertainty, axis=-1)
-    
-    # mean log density per class
-    gmm_log_density_mean_per_class = log_prob.mean(axis=(0, 1))
-    
-    softmax = torch.softmax(logits, dim=-1) # normal
-    del logits # free memory
-    
-    softmax_entropy = entropy_prob(softmax) # get_confidence_from_entropy(entropy_prob(preds), num_classes)
-    softmax_entropy_per_sample = torch.mean(softmax_entropy, axis=-1)
-
-    # flatten all the tensors
-    gmm_uncertainty = torch.flatten(gmm_uncertainty, 0, 1)
-    softmax_entropy = torch.flatten(softmax_entropy, 0, 1)
-    softmax = torch.flatten(softmax, 0, 1)
-    log_prob = torch.flatten(log_prob, 0, 1)
-    label_cls_ids = torch.flatten(label_cls_ids)
-    
-    pred_cls_ids = torch.max(softmax, dim=-1)[1]
-
-    if not any(sample in sample_names for sample in INTERESTING_SAMPLES):
-        save_indices = [0]
-    else:
-        save_indices = [sample_names.index(sample) for sample in INTERESTING_SAMPLES]
-
-    pred_cls_ids_save = pred_cls_ids.view((num_samples, wl, wl, h))[save_indices].cpu().numpy()
-    label_cls_ids_save = label_cls_ids.view((num_samples, wl, wl, h))[save_indices].cpu().numpy()
-    softmax_entropy_save = softmax_entropy.view((num_samples, wl, wl, h))[save_indices].cpu().numpy()
-    gmm_uncertainty_save = gmm_uncertainty.view((num_samples, wl, wl, h))[save_indices].cpu().numpy()
-    sample_names_save = [sample_names[i] for i in save_indices]
-    
-    ##Save predictions and uncertainties for visualization
     output_dir = "clean" if args.overwrite_nuscenes_root is None else "_".join(args.overwrite_nuscenes_root.split("/")[-2:])
     output_dir += f"_scale{feature_scale_lvl}"
     save_dir = os.path.join(os.path.dirname(args.checkpoint), output_dir)
-    
-    for i in range(len(save_indices)):
-        sample_save_dir = os.path.join(save_dir, sample_names_save[i])
-        os.makedirs(sample_save_dir, exist_ok=True)
-        np.save(os.path.join(sample_save_dir, 'predictions.npy'), pred_cls_ids_save[i])
-        np.save(os.path.join(sample_save_dir, 'labels.npy'), label_cls_ids_save[i])
-        np.save(os.path.join(sample_save_dir, 'entropy.npy'), softmax_entropy_save[i])
-        np.save(os.path.join(sample_save_dir, 'gmm_log_density.npy'), gmm_uncertainty_save[i])
-    del pred_cls_ids_save, label_cls_ids_save, softmax_entropy_save, gmm_uncertainty_save
+    os.makedirs(save_dir, exist_ok=True)
 
-    # Averages per Sample
-    np.savetxt(os.path.join(save_dir, 'gmm_uncertainty_per_sample.csv'), gmm_uncertainty_per_sample.cpu().numpy(), delimiter=",")
-    np.savetxt(os.path.join(save_dir, 'softmax_entropy_per_sample.csv'), softmax_entropy_per_sample.cpu().numpy(), delimiter=",")
-    
-    # gmm_uncertainty per voxel
-    np.save(os.path.join(save_dir, 'gmm_uncertainty_per_voxel.npy'), gmm_uncertainty.cpu().numpy().astype(np.float16))
-    
-    # gmm_uncertainy per voxel only for occupied voxels
-    mask = (pred_cls_ids != 0)
-    np.save(os.path.join(save_dir, 'gmm_uncertainty_per_occupied_voxel.npy'), gmm_uncertainty[mask].cpu().numpy().astype(np.float16))
+    np.savetxt(os.path.join(save_dir, 'gmm_uncertainty_per_sample.csv'), gmm_uncertainty_per_sample, delimiter=",")
+    np.savetxt(os.path.join(save_dir, 'softmax_entropy_per_sample.csv'), softmax_entropy_per_sample, delimiter=",")
+    np.savetxt(os.path.join(save_dir, 'max_softmax_per_sample.csv'), max_softmax_per_sample, delimiter=",")
 
     # Histogram of gmm_uncertainty_per_sample
     plt.figure()
-    plt.hist(gmm_uncertainty_per_sample.cpu().numpy(), bins=50)
+    plt.hist(gmm_uncertainty_per_sample, bins=50)
     plt.xlabel("GMM Log Density")
-    plt.ylabel("Frequency (normalized)")
+    plt.ylabel("Frequency")
     plt.title("GMM Uncertainty per Sample")
     plt.savefig(os.path.join(save_dir, 'gmm_uncertainty_per_sample.png'))
     plt.close()
-    del gmm_uncertainty_per_sample, softmax_entropy_per_sample
 
-    # Bar Plot of gmm_log_density_mean_per_class with class names
-    class_names = np.array(['Unoccupied'] + dataset.class_names)
+    # Histogram of softmax_entropy_per_sample
     plt.figure()
-    plt.bar(class_names, gmm_log_density_mean_per_class.numpy())
-    plt.xticks(rotation=90)
-    plt.tight_layout()
-    plt.savefig(os.path.join(save_dir, 'gmm_log_density_mean_per_class.png'))
-    plt.close()
-
-    # Print class_names, gmm_log_density_mean_per_class pretty format
-    result = ""
-    result += "Class Name: GMM Log Density Mean\n"
-    for class_name, density_mean in zip(class_names, gmm_log_density_mean_per_class):
-        result += f"{class_name}: {density_mean}\n"
-
-    # Plot a normalized histogram of gmm_uncertainty for occupied voxels
-    plt.figure()
-    mask = (pred_cls_ids != 0)
-    plt.hist(gmm_uncertainty[mask].numpy(), bins=50, density=True, range=(-50, 200))
-    plt.xlabel("GMM Log Density")
-    plt.ylabel("Frequency (normalized)")
-    plt.title("GMM Uncertainty (pred_cls_ids != 0)")
-    plt.savefig(os.path.join(save_dir, 'gmm_uncertainty_nonempty.png'))
-    plt.close()
-
-
-    # Plot a normalized histogram of gmm_uncertainty for empty
-    plt.figure()
-    mask = (pred_cls_ids == 0)
-    plt.hist(gmm_uncertainty[mask].numpy(), bins=50, density=True, range=(-50, 200))
-    plt.xlabel("GMM Log Density")
-    plt.ylabel("Frequency (normalized)")
-    plt.title("GMM Uncertainty (pred_cls_ids == 0)")
-    plt.savefig(os.path.join(save_dir, 'gmm_uncertainty_empty.png'))
-    plt.close()
-
-    # Plot a normalized histogram of non-empty softmax_entropy
-    plt.figure()
-    mask = (pred_cls_ids != 0)
-    plt.hist(softmax_entropy[mask].numpy(), bins=50, density=True, range=(0, 2))
+    plt.hist(softmax_entropy_per_sample, bins=50)
+    plt.xlim(0, 0.2)
     plt.xlabel("Softmax Entropy")
-    plt.ylabel("Frequency (normalized)")
-    plt.title("Softmax Entropy (pred_cls_ids != 0)")
-    plt.savefig(os.path.join(save_dir, 'softmax_entropy_nonempty.png'))
+    plt.ylabel("Frequency")
+    plt.title("Softmax Entropy per Sample")
+    plt.savefig(os.path.join(save_dir, 'softmax_entropy_per_sample.png'))
     plt.close()
-    
-    # Plot a normalized histogram of empty softmax_entropy
+
+    # Histogram of max_softmax_per_sample
     plt.figure()
-    mask = (pred_cls_ids == 0)
-    plt.hist(softmax_entropy[mask].numpy(), bins=50, density=True, range=(0, 2))
-    plt.xlabel("Softmax Entropy")
-    plt.ylabel("Frequency (normalized)")
-    plt.title("Softmax Entropy (pred_cls_ids == 0)")
-    plt.savefig(os.path.join(save_dir, 'softmax_entropy_empty.png'))
+    plt.hist(max_softmax_per_sample, bins=50)
+    plt.xlim(0.8, 1.0)
+    plt.xlabel("Max Softmax Probability")
+    plt.ylabel("Frequency")
+    plt.title("Max Softmax Probability per Sample")
+    plt.savefig(os.path.join(save_dir, 'max_softmax_per_sample.png'))
     plt.close()
-
-    # Handle ignore class and cast to numpy
-    mask = (label_cls_ids != 255)
-    label_cls_ids = label_cls_ids[mask]
-    pred_cls_ids = pred_cls_ids[mask]
-    softmax = softmax[mask]
-    softmax_entropy = softmax_entropy[mask]
-    gmm_uncertainty = gmm_uncertainty[mask]
-
-    # Calculate IoU, MIoU
-    result += "\n\n"
-    class_ious = []
-    for j in range(len(CLASS_NAMES)):
-        if j == 0: # class 0 for geometry IoU
-            tp = ((label_cls_ids != 0) * (pred_cls_ids != 0)).sum() #TP
-            tp_fn = (label_cls_ids != 0).sum() #TP+FN
-            tp_fp = (pred_cls_ids != 0).sum() #TP+FP
-        else:
-            tp = ((label_cls_ids == j) * (pred_cls_ids == j)).sum() #TP
-            tp_fn = (label_cls_ids == j).sum() #TP+FN
-            tp_fp = (pred_cls_ids == j).sum() #TP+FP
-
-        #Calculate the IoU for class j
-        iou = tp/(tp_fn+tp_fp-tp) #TP/(TP+FN+FP)
-        iou = iou.item()
-        
-        class_ious.append(iou) 
-        result += CLASS_NAMES[j] + ":" + f"{iou:.4f}" + "\n"
-    result += "mIoU:" + str(np.mean(np.array(class_ious)[1:])) + "\n\n"
-
-
-    # Calculate NLL and ECE
-    # NLL for Global Predictions
-    nll = torch.nn.functional.nll_loss(
-        input=torch.log(softmax + 1e-8),
-        target=label_cls_ids.long(),
-        reduction='mean'
-    )
-    result += f"Global NLL: {nll.item()}\n"
-
-    # Calculate ECE
-    n_bins = 10
-    ece = ECE(n_bins)
-    ece_score = ece.measure(
-        X=softmax.max(axis=-1)[0].numpy(),
-        y=(label_cls_ids==pred_cls_ids).numpy()
-    )
-    result += f"Global ECE: {ece_score}\n"
-
-    # NLL Non-Empty Predictions
-    mask = (pred_cls_ids != 0)
-    non_empty_label_cls_ids = label_cls_ids[mask]
-    non_empty_pred_cls_ids = pred_cls_ids[mask]
-    non_empty_preds = softmax[mask]
-    non_empty_softmax_entropy = softmax_entropy[mask]
-    
-    nll = torch.nn.functional.nll_loss(
-        input=torch.log(non_empty_preds + 1e-8),
-        target=non_empty_label_cls_ids.long(),
-        reduction='mean'
-    )
-    result += f"Non-Empty NLL: {nll.item()}\n"
-    
-    ece_score = ece.measure(
-        X=non_empty_preds.max(axis=-1)[0].numpy(),
-        y=(non_empty_label_cls_ids==non_empty_pred_cls_ids).numpy()
-    )
-    result += f"Non-Empty ECE: {ece_score}\n"
-    del non_empty_preds, non_empty_label_cls_ids, non_empty_pred_cls_ids, non_empty_softmax_entropy
-
-
-    # NLL for Empty Predictions
-    mask = (pred_cls_ids == 0)
-    empty_label_cls_ids = label_cls_ids[mask]
-    empty_pred_cls_ids = pred_cls_ids[mask]
-    empty_preds = softmax[mask]
-    empty_softmax_entropy = softmax_entropy[mask]
-    
-    nll = torch.nn.functional.nll_loss(
-        input=torch.log(empty_preds + 1e-8),
-        target=empty_label_cls_ids.long(),
-        reduction='mean'
-    )
-    result += f"Empty NLL: {nll.item()}\n"
-    
-    ece_score = ece.measure(
-        X=empty_preds.max(axis=-1)[0].numpy(),
-        y=(empty_label_cls_ids==empty_pred_cls_ids).numpy()
-    )
-    result += f"Empty ECE: {ece_score}\n"
-    del empty_preds, empty_label_cls_ids, empty_pred_cls_ids, empty_softmax_entropy
-    
-    
-    print(result)
-    with open(os.path.join(save_dir, 'results.txt'), 'w') as f:
-        f.write(result)
-
-
-def entropy_prob(probs):
-    logp = torch.log(probs + 1e-12)
-    plogp = probs * logp
-    entropy = -torch.sum(plogp, axis=-1)
-    return entropy
-
-
-def get_confidence_from_entropy(entropy, class_num):
-    #normalize entropy to have range [0,1] instead of range [0, log(class_num)]
-    normalized_entropy = entropy / torch.log(torch.tensor(class_num))
-    #invert normalized_entropy because low entropy means high confidence and vice versa
-    inverted_normalized_entropy = 1 - normalized_entropy
-    return inverted_normalized_entropy
-
 
 if __name__ == '__main__':
     main()

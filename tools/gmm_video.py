@@ -11,6 +11,20 @@ import warnings
 import numpy as np
 from tqdm import tqdm
 
+import cv2
+from PIL import Image
+import open3d as o3d
+import matplotlib
+import matplotlib.pyplot as plt
+import matplotlib.patches as mpatches
+import matplotlib.cm as cm
+from scipy.signal import savgol_filter
+import glob
+import os
+import io
+from PIL import Image
+from prettytable import PrettyTable
+
 from mmcv import Config, DictAction
 from mmcv.cnn import fuse_conv_bn
 from mmcv.parallel import MMDataParallel
@@ -22,43 +36,14 @@ from mmdet3d.models import build_model
 from mmdet.apis import set_random_seed
 from mmdet.datasets import replace_ImageToTensor
 
-from prettytable import PrettyTable
-
-import cv2
-from PIL import Image
-import open3d as o3d
-import matplotlib
-import matplotlib.pyplot as plt
-from matplotlib.colors import Normalize
-from matplotlib.cm import ScalarMappable
-import matplotlib.patches as mpatches
-from open3d import geometry
-import matplotlib.cm as cm
-from scipy.signal import savgol_filter
-import glob
-import os
-import io
-from PIL import Image
+from tools.gmm_utils import (
+    multiscale_supervision,
+    entropy_prob,
+    means_precisions_cholesky,
+    jit_log_prob
+)
 
 matplotlib.use('Agg')
-
-
-def entropy_prob(probs):
-    logp = torch.log(probs + 1e-12)
-    plogp = probs * logp
-    entropy = -torch.sum(plogp, axis=-1)
-    return entropy
-
-
-def multiscale_supervision(gt_occ, ratio, gt_shape):
-    '''
-    change ground truth shape as (B, W, H, Z) for each level supervision
-    '''
-    gt = torch.zeros([gt_shape[0], gt_shape[1], gt_shape[2], gt_shape[3]]).to(gt_occ.device).type(torch.float) 
-    for i in range(gt.shape[0]):
-        coords = gt_occ[i][:, :3].type(torch.long) // ratio
-        gt[i, coords[:, 0], coords[:, 1], coords[:, 2]] =  gt_occ[i][:, 3]
-    return gt
 
 
 def count_parameters(model, print_table=True):
@@ -364,7 +349,12 @@ def gmm_video(model, gmm, prior_log_prob, data_loader, feature_scale_lvl, num_sa
         1: 4,
         0: 2
     }[feature_scale_lvl]
-    
+
+    # for fast GMM evaluation on GPU
+    means, precisions_cholesky = means_precisions_cholesky(gmm)
+    means = means.cuda()
+    precisions_cholesky = precisions_cholesky.cuda()
+
     gmm_mean_values = []
     entropy_mean_values = []
     for i, data in tqdm(enumerate(data_loader), total=num_samples):
@@ -401,11 +391,12 @@ def gmm_video(model, gmm, prior_log_prob, data_loader, feature_scale_lvl, num_sa
             scale_ratio = 2**(len(model.module.logits) - 1 - feature_scale_lvl)
             label = multiscale_supervision(data['gt_occ'].clone(), scale_ratio, feature.shape)
 
-            feature = torch.flatten(feature, 0, 3).cpu()
+            feature = torch.flatten(feature, 0, 3)
             label = torch.flatten(label).cpu()
             logit = torch.flatten(logit, 0, 3).cpu()
             
-            log_prob = gmm.log_prob(feature[:, None, :])
+            log_prob = jit_log_prob(feature, means, precisions_cholesky).cpu()
+            
             log_prob = torch.clamp(log_prob, min=-100000, max=100000)
             log_prob = log_prob + prior_log_prob
             
@@ -510,9 +501,12 @@ def gmm_video_v2(model, gmm, prior_log_prob, data_loader, feature_scale_lvl, num
         1: 4,
         0: 2
     }[feature_scale_lvl]
-    
-    gmm_mean_values = []
-    entropy_mean_values = []
+
+    # for fast GMM evaluation on GPU
+    means, precisions_cholesky = means_precisions_cholesky(gmm)
+    means = means.cuda()
+    precisions_cholesky = precisions_cholesky.cuda()
+
     for i, data in tqdm(enumerate(data_loader), total=num_samples):
         with torch.no_grad():
             _ = model(return_loss=False, rescale=True, **data)
@@ -546,11 +540,12 @@ def gmm_video_v2(model, gmm, prior_log_prob, data_loader, feature_scale_lvl, num
             scale_ratio = 2**(len(model.module.logits) - 1 - feature_scale_lvl)
             label = multiscale_supervision(data['gt_occ'].clone(), scale_ratio, feature.shape)
 
-            feature = torch.flatten(feature, 0, 3).cpu()
+            feature = torch.flatten(feature, 0, 3)
             label = torch.flatten(label).cpu()
             logit = torch.flatten(logit, 0, 3).cpu()
             
-            log_prob = gmm.log_prob(feature[:, None, :])
+            log_prob = jit_log_prob(feature, means, precisions_cholesky).cpu()
+            
             log_prob = torch.clamp(log_prob, min=-100000, max=100000)
             log_prob = log_prob + prior_log_prob
             
@@ -628,7 +623,6 @@ def gmm_video_v2(model, gmm, prior_log_prob, data_loader, feature_scale_lvl, num
     cv2.destroyAllWindows()
 
 
-
 def gmm_video_v3(model, gmm, prior_log_prob, data_loader, feature_scale_lvl, num_samples, save_dir):
     wl = {
         3: 200,
@@ -642,6 +636,11 @@ def gmm_video_v3(model, gmm, prior_log_prob, data_loader, feature_scale_lvl, num
         1: 4,
         0: 2
     }[feature_scale_lvl]
+
+    # for fast GMM evaluation on GPU
+    means, precisions_cholesky = means_precisions_cholesky(gmm)
+    means = means.cuda()
+    precisions_cholesky = precisions_cholesky.cuda()
 
     for i, data in tqdm(enumerate(data_loader), total=num_samples):
         with torch.no_grad():
@@ -680,11 +679,12 @@ def gmm_video_v3(model, gmm, prior_log_prob, data_loader, feature_scale_lvl, num
             scale_ratio = 2**(len(model.module.logits) - 1 - feature_scale_lvl)
             label = multiscale_supervision(data['gt_occ'].clone(), scale_ratio, feature.shape)
 
-            feature = torch.flatten(feature, 0, 3).cpu()
+            feature = torch.flatten(feature, 0, 3)
             label = torch.flatten(label).cpu()
             logit = torch.flatten(logit, 0, 3).cpu()
             
-            log_prob = gmm.log_prob(feature[:, None, :])
+            log_prob = jit_log_prob(feature, means, precisions_cholesky).cpu()
+            
             log_prob = torch.clamp(log_prob, min=-100000, max=100000)
             log_prob = log_prob + prior_log_prob
             
@@ -826,16 +826,13 @@ def main():
     
     num_samples = len(data_loader)
     num_classes = 1 + len(dataset.class_names)
-    device = torch.device('cpu')
     feature_scale_lvl = args.feature_scale_lvl
     
     gmm = torch.load(
-        os.path.join(os.path.dirname(args.checkpoint), f'train_gmm_scale_{feature_scale_lvl}.pt'),
-        map_location=device
+        os.path.join(os.path.dirname(args.checkpoint), f'train_gmm_scale_{feature_scale_lvl}.pt')
     )
     prior_log_prob = torch.load(
-        os.path.join(os.path.dirname(args.checkpoint), f'train_prior_log_prob_scale_{feature_scale_lvl}.pt'),
-        map_location=device
+        os.path.join(os.path.dirname(args.checkpoint), f'train_prior_log_prob_scale_{feature_scale_lvl}.pt')
     )
 
     save_dir = "clean" if args.overwrite_nuscenes_root is None else "_".join(args.overwrite_nuscenes_root.split("/")[-2:])
