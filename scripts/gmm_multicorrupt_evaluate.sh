@@ -37,7 +37,7 @@ done
 
 python scripts/ood_detection_evaluation.py \
 --work_dirs /workspace/work_dirs/occuq_mlpv5_sn \
-feature_scale_lvl $scale
+--feature_scale_lvl $scale
 
 
 # Mean across all corruptions and levels
