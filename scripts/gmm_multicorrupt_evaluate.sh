@@ -40,6 +40,7 @@ python scripts/ood_detection_evaluation.py \
 --feature_scale_lvl $scale
 
 
+# Scale 3 - Full Resolution
 # Mean across all corruptions and levels
 #         Measure  mAUROC  mAUPR  mFPR95
 #             GMM   80.15  79.43   56.18
