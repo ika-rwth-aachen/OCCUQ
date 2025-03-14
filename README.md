@@ -1,7 +1,7 @@
 <p align="center">
   <img src="assets/occuq.png" align="center" width="40%">
   
-  <h3 align="center"><strong>OCCUQ: Efficient Uncertainty Quantification for 3D Occupancy Prediction</strong></h3>
+  <h3 align="center"><strong>OCCUQ: Exploring Efficient Uncertainty Quantification for 3D Occupancy Prediction</strong></h3>
 
   <p align="center">
       <a href="https://github.com/SeverinHeidrich" target='_blank'>Severin Heidrich*</a><sup>1</sup>&nbsp;&nbsp;
