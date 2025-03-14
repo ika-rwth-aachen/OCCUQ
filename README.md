@@ -183,15 +183,14 @@ We thank the BMBF and EU for funding this project ❤️
 ## Citation
 If this work is helpful for your research, please consider citing this work:
 
+
+
 ```
-@misc{heidrich2025occuqexploringefficientuncertainty,
-      title={OCCUQ: Exploring Efficient Uncertainty Quantification for 3D Occupancy Prediction}, 
-      author={Severin Heidrich and Till Beemelmanns and Alexey Nekrasov and Bastian Leibe and Lutz Eckstein},
-      year={2025},
-      eprint={2503.10605},
-      archivePrefix={arXiv},
-      primaryClass={cs.CV},
-      url={https://arxiv.org/abs/2503.10605}, 
+@inproceedings{heidrich2025occuq,
+ title={{OCCUQ: Exploring Efficient Uncertainty Quantification for 3D Occupancy Prediction}},
+ author={Heidrich, Severin and Beemelmanns, Till and Nekrasov, Alexey and Leibe, Bastian and Eckstein, Lutz},
+ booktitle="International Conference on Robotics and Automation (ICRA)",
+ year={2025}
 }
 ```
 
