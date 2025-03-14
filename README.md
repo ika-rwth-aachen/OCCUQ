@@ -23,7 +23,7 @@
 -------------------------------
 
 <!-- omit in toc -->
-### [Paper](https://arxiv.org/) | [Video](https://youtu.be/yVDy-lHESY0) | [Dataset](https://huggingface.co/datasets/TillBeemelmanns/MultiCorrupt/tree/main)
+### [Paper](https://arxiv.org/abs/2503.10605) | [Video](https://youtu.be/yVDy-lHESY0) | [Dataset](https://huggingface.co/datasets/TillBeemelmanns/MultiCorrupt/tree/main)
 
 
 <!-- omit in toc -->
@@ -184,6 +184,14 @@ We thank the BMBF and EU for funding this project ❤️
 If this work is helpful for your research, please consider citing this work:
 
 ```
-TODO
+@misc{heidrich2025occuqexploringefficientuncertainty,
+      title={OCCUQ: Exploring Efficient Uncertainty Quantification for 3D Occupancy Prediction}, 
+      author={Severin Heidrich and Till Beemelmanns and Alexey Nekrasov and Bastian Leibe and Lutz Eckstein},
+      year={2025},
+      eprint={2503.10605},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV},
+      url={https://arxiv.org/abs/2503.10605}, 
+}
 ```
 
