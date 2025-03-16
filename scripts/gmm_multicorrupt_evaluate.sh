@@ -5,6 +5,10 @@ export PYTHONPATH=$PYTHONPATH:/workspace
 
 config=/workspace/projects/configs/occuq/occuq_mlpv5_sn.py
 weight=/workspace/work_dirs/occuq_mlpv5_sn/epoch_6.pth
+# Scale 3 - 200x200x16 (Full Resolution)
+# Scale 2 - 100x100x8
+# Scale 1 - 50x50x4
+# Scale 0 - 20x20x2
 scale=3
 
 python tools/gmm_fit.py \
