@@ -23,7 +23,7 @@
 -------------------------------
 
 <!-- omit in toc -->
-### [Paper](https://arxiv.org/abs/2503.10605) | [Video](https://youtu.be/yVDy-lHESY0) | [Dataset](https://huggingface.co/datasets/TillBeemelmanns/MultiCorrupt/tree/main)
+### [Paper](https://arxiv.org/abs/2503.10605) | [Video](https://youtu.be/yVDy-lHESY0) | [Dataset](https://github.com/ika-rwth-aachen/MultiCorrupt)
 
 
 <!-- omit in toc -->

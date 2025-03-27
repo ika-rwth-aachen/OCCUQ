@@ -59,28 +59,23 @@ to generate the dataset on your own, by corrupting the original nuScenes dataset
 
 
 ### Download Dataset
-Download the precompiled MultiCorrupt dataset from 
-[Huggingface](https://huggingface.co/datasets/TillBeemelmanns/MultiCorrupt) 
-and extract the compressed dataset with the following script:
+Follow the Huggingface [Dataset Download](https://huggingface.co/docs/hub/datasets-downloading) instructions and download the dataset from the following link:
+[https://huggingface.co/datasets/TillBeemelmanns/MultiCorrupt](https://huggingface.co/datasets/TillBeemelmanns/MultiCorrupt)
+
+For example, you can run the following command to install the huggingface cli
+```bash
+pip install -U "huggingface_hub[cli]"
+```
+
+then download the whole dataset with
+```bash
+huggingface-cli download TillBeemelmanns/MultiCorrupt --repo-type dataset --local-dir /path/to/dataset
+```
+
+Please note the default cache location is `~/.cache/huggingface/datasets/downloads/`. This might cause problems if your local host does not have much free space in the `/home` directory. Change the cache location by setting the shell environment variable `HF_HOME` to another directory:
 
 ```bash
-#!/bin/bash
-
-# Set directories
-compressed_dir="multicorrupt"
-destination_dir="multicorrupt_uncompressed"
-mkdir -p "$destination_dir"
-
-# Iterate over all split archives
-for archive in "$compressed_dir"/*.tar.gz.part00; do
-    base_name=$(basename "$archive" .tar.gz.part00)
-    category=$(echo "$base_name" | cut -d'_' -f1)
-    subfolder=$(echo "$base_name" | cut -d'_' -f2)
-    
-    # Create category directory if it doesn't exist
-    mkdir -p "$destination_dir/$category/$subfolder"
-    
-    echo "Reconstructing and extracting $base_name..."
-    cat "$compressed_dir/${base_name}.tar.gz.part"* | tar -xzvf - -C "$destination_dir/$category/$subfolder"
-done
+$ export HF_HOME="/path/to/another/directory/datasets"
 ```
+
+Unzip the compressed dataset with the [unzip_compressed_dataset.sh](https://github.com/ika-rwth-aachen/MultiCorrupt/blob/main/helper/unzip_compressed_dataset.sh) script.
