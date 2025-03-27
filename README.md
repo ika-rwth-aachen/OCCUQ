@@ -44,6 +44,7 @@
 
 
 ## News
+- [03/13/2025] OCCUQ paper is published on [arXiv](https://arxiv.org/abs/2503.10605)
 - [01/31/2025] OCCUQ is accepted to ICRA2025.
 
 ## Introduction
