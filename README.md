@@ -191,11 +191,29 @@ We generated voxel visualizations as in the videos with
 [Mayavi](https://github.com/enthought/mayavi). More instructions will follow soon.
 
 
+### Fast GMM GPU Evaluation
+What we have not mentioned in the paper is that we are using a custom GMM
+ evaluation function to speed up the GMM inference. The original implementation
+ of `torch.distributions.multivariate_normal.MultivariateNormal` is not
+optimized for GPU inference. The `log_prob()` function is not implemented
+for GPU, and the inference for 640.000 voxels (200x200x16) with 32 features each
+can take more than 1s inference time, which would be too slow for a
+real-time application.
+
+To run the GMM inference on GPU, we use a Cholesky decomposition of the 
+covariance matrix and the `torch.linalg.solve_triangular` function to compute
+the log-probabilities of the GMM. This reduces the inference time to approx. 
+10 milliseconds for each frame with 640.000 voxels with negeligible accuracy loss. 
+
+Please check out the [gmm_jit_log_prob.ipynb](notebooks/gmm_jit_log_prob.ipynb)
+notebook for a comparison of the original and the optimized GMM inference.
+
+
 ## TODOs
-- [x] Upload MultiCorrupt dataset for evaluation
+- [X] Upload MultiCorrupt dataset for evaluation
 - [X] Add scripts for OOD detection
+- [X] Explain GMM GPU inference
 - [ ] Explain which corruptions were used
-- [ ] Explain GMM GPU inference
 - [ ] Add scripts for Region OOD Detection
 - [ ] Add Monte Carlo Dropout and Deep Ensembles
 - [ ] Add Uncertainty Guided Temperature Scaling (UGTS)
