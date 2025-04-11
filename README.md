@@ -38,6 +38,7 @@
   - [2. Inference](#2-inference)
   - [3. OOD Detection](#3-ood-detection)
   - [4. Generate Video](#4-generate-video)
+- [GMM GPU Acceleration](#gmm-gpu-acceleration)
 - [TODOs](#todos)
 - [Acknowledgement](#acknowledgement)
 - [Citation](#citation)
@@ -191,7 +192,7 @@ We generated voxel visualizations as in the videos with
 [Mayavi](https://github.com/enthought/mayavi). More instructions will follow soon.
 
 
-### Fast GMM GPU Evaluation
+## GMM GPU Acceleration
 What we have not mentioned in the paper is that we are using a custom GMM
  evaluation function to speed up the GMM inference. The original implementation
  of `torch.distributions.multivariate_normal.MultivariateNormal` is not
