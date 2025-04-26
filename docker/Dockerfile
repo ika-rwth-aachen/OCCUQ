@@ -20,7 +20,7 @@ ENV PATH="/root/.local/bin:${PATH}"
 # Install MMEngine, MMCV and MMDetection
 RUN pip install openmim && \
     mim install "mmengine" "mmcv==1.4.0" "mmdet==2.14.0" "mmsegmentation==0.14.1" \
-    && pip install gpustat spconv-cu114 ipdb timm open3d-python
+    && pip install gpustat spconv-cu114 ipdb timm
 
 # Workarounds
 RUN pip install tensorboard==2.9.0 scikit-image==0.18.3 scikit-learn==1.0.1 nuscenes-devkit==1.1.3 yapf==0.40.1 setuptools==59.5.0
@@ -34,6 +34,7 @@ RUN pip install numba==0.48.0 --ignore-installed
 RUN pip install backports.tarfile
 RUN pip install opencv-python==4.5.5.64
 RUN pip install numpy==1.22.4
+RUN pip install open3d
 
 RUN git clone --branch v0.17.1 https://github.com/open-mmlab/mmdetection3d.git mmdetection3d && \
     cd mmdetection3d && \
