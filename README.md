@@ -23,7 +23,7 @@
 -------------------------------
 
 <!-- omit in toc -->
-### [Paper](https://arxiv.org/abs/2503.10605) | [Video](https://youtu.be/yVDy-lHESY0) | [Dataset](https://github.com/ika-rwth-aachen/MultiCorrupt)
+### [Paper](https://arxiv.org/abs/2503.10605) | [Poster](assets/ICRA_2025_Poster_Portrait.pdf) | [Video](https://youtu.be/yVDy-lHESY0) | [Dataset](https://github.com/ika-rwth-aachen/MultiCorrupt)
 
 
 <!-- omit in toc -->
@@ -45,6 +45,7 @@
 
 
 ## News
+- [07/14/2025] [Poster](assets/ICRA_2025_Poster_Portrait.pdf) is uploaded
 - [03/13/2025] OCCUQ paper is published on [arXiv](https://arxiv.org/abs/2503.10605)
 - [01/31/2025] OCCUQ is accepted to ICRA2025.
 
