@@ -45,6 +45,7 @@
 
 
 ## News
+- [09/02/2025] OCCUQ paper is available on [IEEE Xplore](https://ieeexplore.ieee.org/document/11128049)
 - [07/14/2025] [Poster](assets/ICRA_2025_Poster_Portrait.pdf) is uploaded
 - [03/13/2025] OCCUQ paper is published on [arXiv](https://arxiv.org/abs/2503.10605)
 - [01/31/2025] OCCUQ is accepted to ICRA2025.
