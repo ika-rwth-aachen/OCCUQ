@@ -671,7 +671,7 @@ def gmm_video_v3(model, gmm, prior_log_prob, data_loader, feature_scale_lvl, num
                     y_offset += img.height
             
             # 960 width
-            new_image = new_image.resize((960, int(960 * new_image.height / new_image.width)))
+            new_image = new_image.resize((1600, int(1600 * new_image.height / new_image.width)))
             
             feature = model.module.pts_bbox_head.feature[feature_scale_lvl]
             logit = model.module.logits[feature_scale_lvl].permute(0, 2, 3, 4, 1)
@@ -697,7 +697,7 @@ def gmm_video_v3(model, gmm, prior_log_prob, data_loader, feature_scale_lvl, num
 
             np.save(f"{save_dir}/gmm_log_density{str(i).zfill(4)}.npy", gmm_uncertainty)
             np.save(f"{save_dir}/gmm_predictions{str(i).zfill(4)}.npy", pred_cls_ids)
-            new_image.save(f"{save_dir}/cameras_{str(i).zfill(4)}.jpg")
+            new_image.save(f"{save_dir}/cameras_{str(i).zfill(4)}.png")
 
             if i == num_samples - 1:
                 break
